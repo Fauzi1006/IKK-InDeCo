@@ -1271,7 +1271,6 @@
             const mDateInput = document.getElementById('m-date');
             if(mDateInput && !mDateInput.value) mDateInput.value = today;
             
-            // Set Analysis default date
             const analysisInput = document.getElementById('analysis-date');
             if(analysisInput && !analysisInput.value) analysisInput.value = today;
 
@@ -1298,7 +1297,7 @@
             if(pageId === 'history') renderHistory();
         }
 
-        // --- 6. DASHBOARD LOGIC (FIXED: READ FROM HISTORY) ---
+        // --- 6. DASHBOARD LOGIC (History Based) ---
         function renderDashboard() {
             let start = document.getElementById('dash-start').value;
             let end = document.getElementById('dash-end').value;
@@ -1314,7 +1313,6 @@
                 document.getElementById('dash-end').value = end; 
             }
 
-            // PERBAIKAN: Dashboard hanya menampilkan data yang berstatus 'Gate In' (History)
             const filteredData = allShipments.filter(d => 
                 d.status === 'Gate In' && 
                 d.date >= start && 
@@ -1429,17 +1427,12 @@
             });
         }
 
-        // --- 7. ANALYSIS LOGIC (FIXED: Plan vs Real) ---
+        // --- 7. ANALYSIS LOGIC (Revisi: Tampil meski data 0) ---
         function updateAnalysis() {
             const selectedDateInput = document.getElementById('analysis-date').value;
             if(!selectedDateInput) return; 
 
-            // Pastikan data sudah diload
-            if(!allShipments || allShipments.length === 0) {
-                // Jangan render kosong jika data belum siap, tunggu listener
-                return; 
-            }
-
+            // Logic start
             const dateObj = new Date(selectedDateInput);
             document.getElementById('analysis-date-display').innerText = `(${dateObj.toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }).toUpperCase()})`;
 
@@ -1451,56 +1444,52 @@
             const stats = {};
             const selfPickup = { pUnit: 0, rUnit: 0, pQty: 0, rQty: 0 }; 
             
-            // Init Stats
+            // Init Stats (Agar tabel selalu muncul meski data 0)
             areas.forEach(a => { stats[a] = { tP:0, tR:0, tQP:0, tQR:0, t_trP:0, t_trR:0, t_tlP:0, t_tlR:0, t_coP:0, t_coR:0, nP:0, nR:0, nQP:0, nQR:0, nt_trP:0, nt_trR:0, nt_tlP:0, nt_tlR:0, nt_coP:0, nt_coR:0 }; });
 
-            allShipments.forEach(item => {
-                if(item.status === 'Cancelled') return;
-                
-                const area = item.area;
-                const qty = parseFloat(item.qty || 0);
-                
-                // Realization Definition: Status must be 'Gate In'
-                const isRealz = (item.status === 'Gate In');
-                const t = (item.truck || "").toLowerCase();
-                
-                // Tanggal Plan
-                let isToday = (item.date === selectedDateInput);
-                let isNext = (item.date === nextDateInput);
-                let markedNextDay = (item.catatan && item.catatan.toUpperCase().includes("NEXT DAY"));
+            // Jika allShipments ada isinya, baru kita hitung. Jika tidak, loop ini tidak jalan dan nilai tetap 0.
+            if(allShipments && allShipments.length > 0) {
+                allShipments.forEach(item => {
+                    if(item.status === 'Cancelled') return;
+                    
+                    const area = item.area;
+                    const qty = parseFloat(item.qty || 0);
+                    const isRealz = (item.status === 'Gate In');
+                    const t = (item.truck || "").toLowerCase();
+                    
+                    let isToday = (item.date === selectedDateInput);
+                    let isNext = (item.date === nextDateInput);
+                    let markedNextDay = (item.catatan && item.catatan.toUpperCase().includes("NEXT DAY"));
 
-                if(!isToday && !isNext) return;
-                
-                if (area === "AMBIL SENDIRI") {
-                    if (isToday) { 
-                        selfPickup.pUnit++; 
-                        selfPickup.pQty += qty; 
-                        if (isRealz) { selfPickup.rUnit++; selfPickup.rQty += qty; } 
+                    if(!isToday && !isNext) return;
+                    
+                    if (area === "AMBIL SENDIRI") {
+                        if (isToday) { 
+                            selfPickup.pUnit++; 
+                            selfPickup.pQty += qty; 
+                            if (isRealz) { selfPickup.rUnit++; selfPickup.rQty += qty; } 
+                        }
+                        return;
                     }
-                    return;
-                }
-                
-                if (stats[area]) {
-                    // Plan Today Logic
-                    if (isToday && !markedNextDay) {
-                        stats[area].tP++; stats[area].tQP += qty;
-                        if (isRealz) { stats[area].tR++; stats[area].tQR += qty; }
-                        
-                        if (t.includes('tronton')) { stats[area].t_trP++; if(isRealz) stats[area].t_trR++; }
-                        else if (t.includes('trailer')) { stats[area].t_tlP++; if(isRealz) stats[area].t_tlR++; }
-                        else if (t.includes('cont') || t.includes('40') || t.includes('20')) { stats[area].t_coP++; if(isRealz) stats[area].t_coR++; }
+                    
+                    if (stats[area]) {
+                        if (isToday && !markedNextDay) {
+                            stats[area].tP++; stats[area].tQP += qty;
+                            if (isRealz) { stats[area].tR++; stats[area].tQR += qty; }
+                            if (t.includes('tronton')) { stats[area].t_trP++; if(isRealz) stats[area].t_trR++; }
+                            else if (t.includes('trailer')) { stats[area].t_tlP++; if(isRealz) stats[area].t_tlR++; }
+                            else if (t.includes('cont') || t.includes('40') || t.includes('20')) { stats[area].t_coP++; if(isRealz) stats[area].t_coR++; }
+                        }
+                        else if ((isToday && markedNextDay) || isNext) {
+                            stats[area].nP++; stats[area].nQP += qty;
+                            if (isRealz) { stats[area].nR++; stats[area].nQR += qty; }
+                            if (t.includes('tronton')) { stats[area].nt_trP++; if(isRealz) stats[area].nt_trR++; }
+                            else if (t.includes('trailer')) { stats[area].nt_tlP++; if(isRealz) stats[area].nt_tlR++; }
+                            else if (t.includes('cont') || t.includes('40') || t.includes('20')) { stats[area].nt_coP++; if(isRealz) stats[area].nt_coR++; }
+                        }
                     }
-                    // Next Day Logic
-                    else if ((isToday && markedNextDay) || isNext) {
-                        stats[area].nP++; stats[area].nQP += qty;
-                        if (isRealz) { stats[area].nR++; stats[area].nQR += qty; }
-                        
-                        if (t.includes('tronton')) { stats[area].nt_trP++; if(isRealz) stats[area].nt_trR++; }
-                        else if (t.includes('trailer')) { stats[area].nt_tlP++; if(isRealz) stats[area].nt_tlR++; }
-                        else if (t.includes('cont') || t.includes('40') || t.includes('20')) { stats[area].nt_coP++; if(isRealz) stats[area].nt_coR++; }
-                    }
-                }
-            });
+                });
+            }
 
             const b = (val) => `<span style="font-weight:800;">${val}</span>`;
             
@@ -1590,10 +1579,23 @@
                 else if(rawArmada.length > 2) armadaType = rawArmada; 
 
                 const note1 = cols[7] ? cols[7].trim() : "";
-                let isSelfPickup = (note1 + " " + manualNote).toUpperCase().includes("AMBIL SENDIRI");
+                // Gabungkan catatan dari Excel dan catatan manual di dashboard untuk dicek
+                let fullNoteText = (note1 + " " + manualNote).toUpperCase();
+                
+                let isSelfPickup = fullNoteText.includes("AMBIL SENDIRI");
+                let isNextDay = fullNoteText.includes("NEXT DAY");
+
                 let finalNote = manualNote;
                 let finalArea = selectedArea;
-                if (isSelfPickup) { finalNote = "AMBIL SENDIRI"; finalArea = "AMBIL SENDIRI"; }
+
+                if (isSelfPickup) { 
+                    // Jika AMBIL SENDIRI, otomatis isi Catatan DAN Area
+                    finalNote = "AMBIL SENDIRI"; 
+                    finalArea = "AMBIL SENDIRI"; 
+                } else if (isNextDay) {
+                    // Jika NEXT DAY, hanya isi Catatan saja (Area tetap sesuai pilihan dropdown)
+                    finalNote = "NEXT DAY";
+                }
 
                 const gbMatch = note1.match(/GB\s*(\d+)/i);
                 let groupKey = gbMatch ? `GB${gbMatch[1]}_${customer.replace(/\s+/g, '').toUpperCase()}_${snNumber}` : `S_${Date.now()}_${Math.random()}`;
@@ -1699,7 +1701,11 @@
 
             let statTotal = 0, statBelumMasuk = 0, statGateIn = 0, statCancelled = 0, statTonase = 0;
 
+            // FILTER: HIDE ARCHIVED ITEMS
             const filteredForTable = allShipments.filter(item => {
+                // Sembunyikan item yang sudah di-archive (dihapus dari view monitoring)
+                if (item.archived) return false;
+
                 const allValues = Object.values(item).join(' ').toLowerCase();
                 const matchesSearch = allValues.includes(q);
                 let matchesStatus = true; 
@@ -1772,6 +1778,7 @@
             const start = document.getElementById('hist-start').value;
             const end = document.getElementById('hist-end').value;
             
+            // HISTORY SHOWS ARCHIVED ITEMS TOO (As long as they are 'Gate In')
             const filtered = allShipments.filter(d => {
                 const isFinished = (d.status === 'Gate In' || d.status === 'Cancelled');
                 if(!isFinished) return false;
@@ -1827,7 +1834,7 @@
             link.href = url; link.click();
         }
 
-        // --- 11. ACTIONS ---
+        // --- 11. ACTIONS & BULK DELETE LOGIC ---
         function toggleAllChecks() {
             const masterCheck = document.getElementById('check-all');
             const rowChecks = document.querySelectorAll('.row-check');
@@ -1866,17 +1873,35 @@
         async function bulkDeleteMonitoring() {
             const checkedBoxes = document.querySelectorAll('.row-check:checked');
             if (checkedBoxes.length === 0) { alert("Pilih data yang akan dihapus."); return; }
-            if (!confirm(`PERINGATAN: Yakin ingin MENGHAPUS PERMANEN ${checkedBoxes.length} data ini dari Database?`)) return;
+            
+            if (!confirm(`PERINGATAN: Anda akan menghapus ${checkedBoxes.length} data dari tampilan Monitoring. Lanjutkan?`)) return;
 
             const batch = db.batch();
+            let archivedCount = 0;
+            let deletedCount = 0;
+
             checkedBoxes.forEach(cb => {
-                const ref = db.collection("monitoring").doc(cb.value);
-                batch.delete(ref);
+                const docId = cb.value;
+                const item = allShipments.find(d => d.id === docId);
+                const ref = db.collection("monitoring").doc(docId);
+                
+                if (item && item.status === 'Gate In') {
+                    // Soft Delete: Archive it so it stays in History but leaves Monitoring
+                    batch.update(ref, { archived: true });
+                    archivedCount++;
+                } else {
+                    // Hard Delete: Cancelled or Planning data is removed completely
+                    batch.delete(ref);
+                    deletedCount++;
+                }
             });
 
             try {
                 await batch.commit();
-                alert("Data berhasil dihapus.");
+                let msg = "Proses Selesai.";
+                if(archivedCount > 0) msg += `\n- ${archivedCount} Data 'Gate In' disimpan ke History (Hilang dari Monitoring).`;
+                if(deletedCount > 0) msg += `\n- ${deletedCount} Data dihapus permanen.`;
+                alert(msg);
                 document.getElementById('check-all').checked = false;
             } catch(err) {
                 alert("Gagal hapus data: " + err.message);
