@@ -1004,59 +1004,65 @@
             </div>
 
             <div id="page-history" class="page">
-                <div class="card">
-                    <h3 style="margin-top:0; border-bottom: 1px solid #e2e8f0; padding-bottom:10px;">
-                        <i class="fa-solid fa-database"></i> Database History (Selesai/Gate In)
-                    </h3>
-                    
-                    <div class="history-controls">
-                        <div style="flex: 1; display:flex; gap:10px; flex-wrap:wrap;">
-                            <div>
-                                <label>Dari Tanggal</label>
-                                <input type="date" id="hist-start">
-                            </div>
-                            <div>
-                                <label>Sampai Tanggal</label>
-                                <input type="date" id="hist-end">
-                            </div>
-                            <div style="display:flex; align-items:end;">
-                                <button class="btn btn-primary" onclick="renderHistory()"><i class="fa-solid fa-search"></i> CARI</button>
-                            </div>
-                        </div>
-                        <div style="display:flex; gap:5px; align-items:end;">
-                            <button class="btn btn-pro-excel" onclick="exportHistoryExcel()"><i class="fa-solid fa-file-export"></i> EXCEL</button>
-                        </div>
-                    </div>
-
-                    <div style="margin-bottom: 15px;">
-                        <input type="text" id="histSearch" class="input-search" placeholder="Cari data history (Global Search)..." onkeyup="renderHistory()">
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="main-data-table" id="table-history-data">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>No DN</th>
-                                    <th>No SN</th>
-                                    <th>Plan Date</th>
-                                    <th>Vendor</th>
-                                    <th>Armada</th>
-                                    <th>Area</th>
-                                    <th>Kota</th>
-                                    <th>Customer</th>
-                                    <th>Qty (Kg)</th>
-                                    <th>Catatan</th>
-                                    <th>Outs</th>
-                                    <th>Gate In Time</th>
-                                    <th>Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="histTableBody"></tbody>
-                        </table>
-                    </div>
+    <div class="card">
+        <h3 style="margin-top:0; border-bottom: 1px solid #e2e8f0; padding-bottom:10px;">
+            <i class="fa-solid fa-database"></i> Database History (Selesai/Gate In)
+        </h3>
+        
+        <div class="history-controls">
+            <div style="flex: 1; display:flex; gap:10px; flex-wrap:wrap;">
+                <div>
+                    <label>Dari Tanggal</label>
+                    <input type="date" id="hist-start">
+                </div>
+                <div>
+                    <label>Sampai Tanggal</label>
+                    <input type="date" id="hist-end">
+                </div>
+                <div style="display:flex; align-items:end;">
+                    <button class="btn btn-primary" onclick="renderHistory()"><i class="fa-solid fa-search"></i> CARI</button>
                 </div>
             </div>
+            
+            <div style="display:flex; gap:10px; align-items:end;">
+                <button class="btn btn-pro-reset" onclick="deleteSelectedHistory()" style="background-color: #ef4444;">
+                    <i class="fa-solid fa-trash-can"></i> HAPUS TERPILIH
+                </button>
+                <button class="btn btn-pro-excel" onclick="exportHistoryExcel()">
+                    <i class="fa-solid fa-file-export"></i> EXCEL
+                </button>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 15px;">
+            <input type="text" id="histSearch" class="input-search" placeholder="Cari data history (Global Search)..." onkeyup="renderHistory()">
+        </div>
+
+        <div class="table-responsive">
+            <table class="main-data-table" id="table-history-data">
+                <thead>
+                    <tr>
+                        <th style="width: 30px;"><input type="checkbox" id="checkAllHistory" onclick="toggleAllHistory(this)"></th>
+                        <th>No</th>
+                        <th>No DN</th>
+                        <th>No SN</th>
+                        <th>Plan Date</th>
+                        <th>Vendor</th>
+                        <th>Armada</th>
+                        <th>Area</th>
+                        <th>Kota</th>
+                        <th>Customer</th>
+                        <th>Qty (Kg)</th>
+                        <th>Catatan</th>
+                        <th>Outs</th>
+                        <th>Gate In Time</th>
+                        </tr>
+                </thead>
+                <tbody id="histTableBody"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
             
             <div id="page-route" class="page"><div class="card"><h3>📍 Route Planning Master</h3><p>Modul dalam pengembangan (Tersambung ke Firestore).</p></div></div>
             <div id="page-driver" class="page"><div class="card"><h3>👮 Driver Master Data</h3><p>Modul dalam pengembangan (Tersambung ke Firestore).</p></div></div>
@@ -1774,52 +1780,99 @@
 
         // --- 10. HISTORY FUNCTIONS ---
         function renderHistory() {
-            const q = document.getElementById('histSearch').value.toLowerCase();
-            const start = document.getElementById('hist-start').value;
-            const end = document.getElementById('hist-end').value;
-            
-            // HISTORY SHOWS ARCHIVED ITEMS TOO (As long as they are 'Gate In')
-            const filtered = allShipments.filter(d => {
-                const isFinished = (d.status === 'Gate In' || d.status === 'Cancelled');
-                if(!isFinished) return false;
+    const q = document.getElementById('histSearch').value.toLowerCase();
+    const start = document.getElementById('hist-start').value;
+    const end = document.getElementById('hist-end').value;
+    
+    // Filter data yang statusnya 'Gate In' atau 'Cancelled'
+    const filtered = allShipments.filter(d => {
+        const isFinished = (d.status === 'Gate In' || d.status === 'Cancelled');
+        if(!isFinished) return false;
 
-                const allValues = Object.values(d).join(' ').toLowerCase();
-                const matchesSearch = allValues.includes(q);
-                let inRange = true;
-                if (start && end) inRange = d.date >= start && d.date <= end;
-                return matchesSearch && inRange;
-            });
-            
-            const tbody = document.getElementById('histTableBody');
-            if(filtered.length === 0) { 
-                tbody.innerHTML = '<tr><td colspan="14" style="padding:20px; color:#64748b; font-style:italic; text-align:center;">Tidak ada data history pada periode ini.</td></tr>'; 
-                return; 
-            }
-            
-            tbody.innerHTML = filtered.map((item, index) => {
-                let outstandingDesc = '-';
-                if (item.originalDate && item.originalDate !== item.date) {
-                    outstandingDesc = `<span class="text-outstanding">Outstanding dari<br>${item.originalDate}</span>`;
-                }
-                return `
-                <tr>
-                    <td>${index + 1}</td>
-                    <td>${item.dns}</td>
-                    <td>${item.sn || '-'}</td>
-                    <td>${item.date}</td>
-                    <td>${item.vendor}</td>
-                    <td>${item.truck || '-'}</td>
-                    <td>${item.area}</td>
-                    <td>${item.city}</td>
-                    <td>${item.customer}</td>
-                    <td class="col-number">${formatNumber(item.qty)}</td>
-                    <td style="color:#d97706; font-weight:600;">${item.catatan || '-'}</td>
-                    <td>${outstandingDesc}</td>
-                    <td style="color:#0f172a; font-weight:600;">${item.gateInTime || '-'}</td>
-                    <td>${item.status}</td>
-                </tr>`
-            }).join('');
+        const allValues = Object.values(d).join(' ').toLowerCase();
+        const matchesSearch = allValues.includes(q);
+        let inRange = true;
+        if (start && end) inRange = d.date >= start && d.date <= end;
+        return matchesSearch && inRange;
+    });
+    
+    const tbody = document.getElementById('histTableBody');
+    
+    // Reset checkbox master saat render ulang
+    const checkAll = document.getElementById('checkAllHistory');
+    if(checkAll) checkAll.checked = false;
+
+    if(filtered.length === 0) { 
+        tbody.innerHTML = '<tr><td colspan="14" style="padding:20px; color:#64748b; font-style:italic; text-align:center;">Tidak ada data history pada periode ini.</td></tr>'; 
+        return; 
+    }
+    
+    tbody.innerHTML = filtered.map((item, index) => {
+        let outstandingDesc = '-';
+        if (item.originalDate && item.originalDate !== item.date) {
+            outstandingDesc = `<span class="text-outstanding">Outstanding dari<br>${item.originalDate}</span>`;
         }
+        
+        return `
+        <tr>
+            <td><input type="checkbox" class="hist-check" value="${item.id}"></td>
+            
+            <td>${index + 1}</td>
+            
+            <td style="font-weight:bold; color:#2563eb;">${item.dns}</td>
+            <td>${item.sn || '-'}</td>
+            <td>${item.date}</td>
+            <td>${item.vendor}</td>
+            <td>${item.truck || '-'}</td>
+            <td>${item.area}</td>
+            <td>${item.city}</td>
+            <td>${item.customer}</td>
+            <td class="col-number">${formatNumber(item.qty)}</td>
+            <td style="color:#d97706; font-weight:600;">${item.catatan || '-'}</td>
+            <td>${outstandingDesc}</td>
+            <td style="color:#0f172a; font-weight:600;">${item.gateInTime || '-'}</td>
+            
+            </tr>`;
+    }).join('');
+}
+
+// Fungsi untuk centang semua checkbox sekaligus
+function toggleAllHistory(source) {
+    const checkboxes = document.querySelectorAll('.hist-check');
+    checkboxes.forEach(c => c.checked = source.checked);
+}
+
+// Fungsi untuk menghapus data yang dicentang
+async function deleteSelectedHistory() {
+    const selected = document.querySelectorAll('.hist-check:checked');
+    if (selected.length === 0) {
+        alert("Pilih data yang akan dihapus terlebih dahulu!");
+        return;
+    }
+
+    if (!confirm(`Apakah Anda yakin ingin menghapus ${selected.length} data terpilih secara permanen dari database?`)) {
+        return;
+    }
+
+    const batch = db.batch();
+    selected.forEach(cb => {
+        // cb.value berisi item.id (ID dokumen Firebase)
+        const docRef = db.collection("monitoring").doc(cb.value);
+        batch.delete(docRef);
+    });
+
+    try {
+        await batch.commit();
+        alert("Data berhasil dihapus!");
+        // Catatan: Karena kita menghapus langsung di Firebase, pastikan sistem Anda 
+        // melakukan fetch ulang data atau menghapus manual dari array 'allShipments'
+        // Jika sistem Anda menggunakan onSnapshot (realtime), tabel akan update otomatis.
+        renderHistory(); 
+    } catch (err) {
+        console.error("Delete Failed:", err);
+        alert("Gagal menghapus data.");
+    }
+}
 
         function exportHistoryExcel() {
             const table = document.getElementById('table-history-data');
