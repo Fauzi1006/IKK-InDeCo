@@ -898,6 +898,10 @@
                             <input type="date" id="bulk-move-date" style="padding: 2px 5px; width: 110px;">
                             <button class="btn btn-primary" onclick="processBulkMoveDate()" style="padding: 2px 8px; font-size: 0.7rem;">GO</button>
                         </div>
+                        
+                        <button class="btn btn-white" onclick="bulkRemoveNextDay()" title="Hapus kata 'Next Day' dari Catatan">
+                            <i class="fa-solid fa-eraser"></i> HAPUS ND
+                        </button>
 
                         <button class="btn btn-white" onclick="exportTableToImage()"><i class="fa-solid fa-camera"></i> IMG</button>
                         <button class="btn btn-pro-excel" onclick="exportToExcel()"><i class="fa-solid fa-file-excel"></i> XLS</button>
@@ -1961,6 +1965,49 @@
                 alert("Data berhasil dipindah!");
                 document.getElementById('check-all').checked = false;
             } catch (err) {
+                alert("Gagal update data: " + err.message);
+            }
+        }
+
+        // --- NEW FUNCTION: BULK REMOVE 'NEXT DAY' ---
+        async function bulkRemoveNextDay() {
+            const checkedBoxes = document.querySelectorAll('.row-check:checked');
+            if (checkedBoxes.length === 0) { alert("Pilih data yang akan dibersihkan catatannya!"); return; }
+
+            if (!confirm(`Hapus kata 'NEXT DAY' dari catatan ${checkedBoxes.length} data terpilih?`)) return;
+
+            const batch = db.batch();
+            let count = 0;
+
+            checkedBoxes.forEach(cb => {
+                const docId = cb.value;
+                const item = allShipments.find(d => d.id === docId);
+
+                if (item && item.catatan) {
+                    // Replace "NEXT DAY" (case insensitive) with empty string
+                    let newNote = item.catatan.replace(/NEXT DAY/gi, "").trim();
+                    // Clean up potential double spaces left behind
+                    newNote = newNote.replace(/\s\s+/g, ' ');
+
+                    if (newNote !== item.catatan) {
+                        const ref = db.collection("monitoring").doc(docId);
+                        batch.update(ref, { catatan: newNote });
+                        count++;
+                    }
+                }
+            });
+
+            if (count === 0) {
+                alert("Tidak ditemukan kata 'Next Day' pada data yang dipilih.");
+                return;
+            }
+
+            try {
+                await batch.commit();
+                alert(`Berhasil menghapus kata 'NEXT DAY' dari ${count} data.`);
+                document.getElementById('check-all').checked = false;
+            } catch (err) {
+                console.error("Error removing tag:", err);
                 alert("Gagal update data: " + err.message);
             }
         }
