@@ -327,9 +327,7 @@
         .main-data-table { 
             width: 100%; 
             border-collapse: collapse; 
-            /* REVISI: Hapus fixed layout agar fleksibel di mobile */
-            /* table-layout: fixed; */
-            min-width: 1000px; /* Force min width so it scrolls instead of squishing */
+            min-width: 1000px; 
         }
 
         .main-data-table th, 
@@ -353,6 +351,53 @@
             height: 40px;
         }
 
+        /* --- KHUSUS HISTORY TABLE STYLE --- */
+        /* Overrides untuk History agar header berwarna Teal seperti screenshot */
+        .history-card-container {
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.05);
+            border: none;
+            padding: 25px;
+            width: 100%;
+        }
+
+        .history-header-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #343a40;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        /* Control Layout */
+        .history-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .history-controls-left { display: flex; gap: 15px; align-items: flex-end; }
+        .history-controls-right { display: flex; gap: 10px; }
+
+        /* Custom Table Header for History */
+        #table-history-data th {
+            background-color: #008080 !important; /* TEAL */
+            border: 1px solid #006666 !important;
+            color: white !important;
+            padding: 12px;
+            font-size: 0.8rem;
+        }
+
+        /* --- END HISTORY STYLE --- */
+
         /* Responsive Column Widths (Desktop base) */
         .main-data-table th:nth-child(1), .main-data-table td:nth-child(1) { width: 40px; }
         .main-data-table th:nth-child(2), .main-data-table td:nth-child(2) { width: 40px; }
@@ -373,11 +418,9 @@
             text-transform: uppercase; 
             display: inline-block; 
             text-align: center; 
-            
-            /* PENTING: Agar bisa wrap di mobile */
             white-space: normal !important; 
             word-break: break-word;
-            min-width: 80px; /* Min width agar teks tidak terlalu gepeng */
+            min-width: 80px; 
             line-height: 1.2;
         }
 
@@ -385,19 +428,12 @@
         .status-gatein { background: #fef08a; color: #854d0e; border: 1px solid #facc15; }
         .status-cancelled { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
 
-        .col-number { 
-            text-align: center !important; 
-            font-weight: 800 !important; 
-            color: #0f172a;
-        }
+        .col-number { text-align: center !important; font-weight: 800 !important; color: #0f172a; }
         
         .main-data-table tr:hover td { background-color: #e2e8f0; }
         .main-data-table tr:nth-child(even) { background-color: #f8fafc; }
 
-        .main-data-table .btn, .main-data-table .btn-action {
-            margin: 0 auto; 
-            display: inline-flex;
-        }
+        .main-data-table .btn, .main-data-table .btn-action { margin: 0 auto; display: inline-flex; }
 
         /* --- 8. COMPONENTS --- */
         .card { background: white; border-radius: 12px; padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-sm); border: 1px solid #e2e8f0; }
@@ -418,15 +454,6 @@
         .btn-pro-excel { background: #059669; color: white; }
         .btn-pro-reset { background: #dc2626; color: white; }
         
-        /* Tombol Update Status di Tabel */
-        .btn-status-trigger {
-            white-space: normal !important; /* Allow wrap */
-            text-align: center;
-            line-height: 1.2;
-            padding: 6px 4px !important;
-            max-width: 100px;
-        }
-
         .btn-action { 
             width: 26px; height: 26px; 
             border-radius: 4px; border:none; 
@@ -501,37 +528,15 @@
             /* Hide Login Illustration on Mobile */
             body[data-logged-in="true"] #login-page { display: none !important; }
 
-            /* FORCE VERTICAL STACK FOR STATUS & BUTTONS */
-            .status-pill {
-                white-space: normal !important; /* Allow wrapping */
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                width: 70px; /* Force small width to trigger break */
-                margin: 0 auto;
-                line-height: 1.1;
-                font-size: 0.6rem;
-                padding: 4px 2px;
-            }
-
-            .btn-status-trigger {
-                white-space: normal !important;
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-                width: 70px; /* Force small width */
-                margin: 0 auto;
-                font-size: 0.6rem !important;
-                line-height: 1.1;
-            }
-
-            /* Adjust Table Padding */
+             /* Adjust Table Padding */
             .main-data-table th, .main-data-table td {
                 padding: 5px 2px;
                 font-size: 0.7rem;
             }
+
+            .history-controls { flex-direction: column; align-items: stretch; }
+            .history-controls-left { flex-wrap: wrap; }
+            .history-controls-right { justify-content: flex-end; }
         }
     </style>
 </head>
@@ -968,41 +973,40 @@
                     </div>
                     
                     <div style="margin-top: 30px; border-top: 2px dashed #cbd5e1; padding-top: 20px;">
-    <div class="theme-dark" style="margin-bottom: 20px;">
-        <div class="table-header-title">📊 UNIT BREAKDOWN : PLAN & NEXT DAY</div>
-        <div class="table-responsive">
-            <table class="combined-table analysis-table" style="border-collapse: collapse; width: 100%; text-align: center; font-size: 0.85rem; background-color: white;">
-                <thead>
-                    <tr style="color: white;">
-                        <th rowspan="3" style="border: 1px solid #cbd5e1; background-color: #1e293b; width: 10%;">AREA</th>
-                        <th colspan="9" style="border: 1px solid #cbd5e1; background-color: #1e3a8a;">PLAN DELIVERY</th>
-                        <th colspan="9" style="border: 1px solid #cbd5e1; background-color: #ea580c;">CARGO NEXT DAY</th>
-                    </tr>
-                    <tr style="color: white;">
-                        <th colspan="3" style="border: 1px solid #cbd5e1; background-color: #2563eb;">TRONTON</th>
-                        <th colspan="3" style="border: 1px solid #cbd5e1; background-color: #2563eb;">TRAILER</th>
-                        <th colspan="3" style="border: 1px solid #cbd5e1; background-color: #2563eb;">CONTAINER</th>
-                        
-                        <th colspan="3" style="border: 1px solid #cbd5e1; background-color: #f59e0b;">TRONTON</th>
-                        <th colspan="3" style="border: 1px solid #cbd5e1; background-color: #f59e0b;">TRAILER</th>
-                        <th colspan="3" style="border: 1px solid #cbd5e1; background-color: #f59e0b;">CONTAINER</th>
-                    </tr>
-                    <tr style="background-color: #f8fafc; font-size: 0.75rem; font-weight: bold;">
-                        <th style="border: 1px solid #cbd5e1;">P</th><th style="border: 1px solid #cbd5e1;">R</th><th style="border: 1px solid #cbd5e1;">G</th>
-                        <th style="border: 1px solid #cbd5e1;">P</th><th style="border: 1px solid #cbd5e1;">R</th><th style="border: 1px solid #cbd5e1;">G</th>
-                        <th style="border: 1px solid #cbd5e1;">P</th><th style="border: 1px solid #cbd5e1;">R</th><th style="border: 1px solid #cbd5e1;">G</th>
-                        
-                        <th style="border: 1px solid #cbd5e1;">P</th><th style="border: 1px solid #cbd5e1;">R</th><th style="border: 1px solid #cbd5e1;">G</th>
-                        <th style="border: 1px solid #cbd5e1;">P</th><th style="border: 1px solid #cbd5e1;">R</th><th style="border: 1px solid #cbd5e1;">G</th>
-                        <th style="border: 1px solid #cbd5e1;">P</th><th style="border: 1px solid #cbd5e1;">R</th><th style="border: 1px solid #cbd5e1;">G</th>
-                    </tr>
-                </thead>
-                <tbody id="body-breakdown-integrated">
-                    </tbody>
-            </table>
-        </div>
-    </div>
-</div>
+                        <div class="theme-dark" style="margin-bottom: 20px;">
+                            <div class="table-header-title">📊 UNIT BREAKDOWN : PLAN & NEXT DAY</div>
+                            <div class="table-responsive">
+                                <table class="combined-table analysis-table" style="border-collapse: collapse; width: 100%; text-align: center; font-size: 0.85rem; background-color: white;">
+                                    <thead>
+                                        <tr style="color: white;">
+                                            <th rowspan="3" style="border: 1px solid #cbd5e1; background-color: #1e293b; width: 10%;">AREA</th>
+                                            <th colspan="9" style="border: 1px solid #cbd5e1; background-color: #1e3a8a;">PLAN DELIVERY</th>
+                                            <th colspan="9" style="border: 1px solid #cbd5e1; background-color: #ea580c;">CARGO NEXT DAY</th>
+                                        </tr>
+                                        <tr style="color: white;">
+                                            <th colspan="3" style="border: 1px solid #cbd5e1; background-color: #2563eb;">TRONTON</th>
+                                            <th colspan="3" style="border: 1px solid #cbd5e1; background-color: #2563eb;">TRAILER</th>
+                                            <th colspan="3" style="border: 1px solid #cbd5e1; background-color: #2563eb;">CONTAINER</th>
+                                            
+                                            <th colspan="3" style="border: 1px solid #cbd5e1; background-color: #f59e0b;">TRONTON</th>
+                                            <th colspan="3" style="border: 1px solid #cbd5e1; background-color: #f59e0b;">TRAILER</th>
+                                            <th colspan="3" style="border: 1px solid #cbd5e1; background-color: #f59e0b;">CONTAINER</th>
+                                        </tr>
+                                        <tr style="background-color: #f8fafc; font-size: 0.75rem; font-weight: bold;">
+                                            <th style="border: 1px solid #cbd5e1;">P</th><th style="border: 1px solid #cbd5e1;">R</th><th style="border: 1px solid #cbd5e1;">G</th>
+                                            <th style="border: 1px solid #cbd5e1;">P</th><th style="border: 1px solid #cbd5e1;">R</th><th style="border: 1px solid #cbd5e1;">G</th>
+                                            <th style="border: 1px solid #cbd5e1;">P</th><th style="border: 1px solid #cbd5e1;">R</th><th style="border: 1px solid #cbd5e1;">G</th>
+                                            
+                                            <th style="border: 1px solid #cbd5e1;">P</th><th style="border: 1px solid #cbd5e1;">R</th><th style="border: 1px solid #cbd5e1;">G</th>
+                                            <th style="border: 1px solid #cbd5e1;">P</th><th style="border: 1px solid #cbd5e1;">R</th><th style="border: 1px solid #cbd5e1;">G</th>
+                                            <th style="border: 1px solid #cbd5e1;">P</th><th style="border: 1px solid #cbd5e1;">R</th><th style="border: 1px solid #cbd5e1;">G</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="body-breakdown-integrated">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
 
                         <div class="theme-dark" style="width: 300px;">
                             <div class="table-header-title">⚫ AMBIL SENDIRI </div>
@@ -1015,63 +1019,65 @@
             </div>
 
             <div id="page-history" class="page">
-                <div class="card">
-                    <h3 style="margin-top:0; border-bottom: 1px solid #e2e8f0; padding-bottom:10px;">
-                        <i class="fa-solid fa-database"></i> Database History (Selesai/Gate In)
-                    </h3>
+                <div class="history-card-container">
                     
+                    <div class="history-header-title">
+                        <i class="fa-solid fa-database"></i> Database History (Selesai/Gate In)
+                    </div>
+
                     <div class="history-controls">
-                        <div style="flex: 1; display:flex; gap:10px; flex-wrap:wrap;">
-                            <div>
-                                <label>Dari Tanggal</label>
-                                <input type="date" id="hist-start">
+                        <div class="history-controls-left">
+                            <div class="form-group" style="margin:0;">
+                                <label style="margin-bottom:2px;">Dari Tanggal</label>
+                                <input type="date" id="hist-start" style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 4px;">
                             </div>
-                            <div>
-                                <label>Sampai Tanggal</label>
-                                <input type="date" id="hist-end">
+                            <div class="form-group" style="margin:0;">
+                                <label style="margin-bottom:2px;">Sampai Tanggal</label>
+                                <input type="date" id="hist-end" style="padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 4px;">
                             </div>
-                            <div style="display:flex; align-items:end;">
-                                <button class="btn btn-primary" onclick="renderHistory()"><i class="fa-solid fa-search"></i> CARI</button>
-                            </div>
+                            <button class="btn btn-primary" onclick="renderHistory()" style="height: 35px; border-radius: 4px;">
+                                <i class="fa-solid fa-search"></i> CARI
+                            </button>
                         </div>
-                        
-                        <div style="display:flex; gap:10px; align-items:end;">
-                            <button class="btn btn-pro-reset" onclick="deleteSelectedHistory()" style="background-color: #ef4444;">
+
+                        <div class="history-controls-right">
+                            <button class="btn btn-pro-reset" onclick="deleteSelectedHistory()" style="background-color: #ef4444; height: 35px; border-radius: 4px;">
                                 <i class="fa-solid fa-trash-can"></i> HAPUS TERPILIH
                             </button>
-                            <button class="btn btn-pro-excel" onclick="exportHistoryExcel()">
+                            <button class="btn btn-pro-excel" onclick="exportHistoryExcel()" style="background-color: #10b981; height: 35px; border-radius: 4px;">
                                 <i class="fa-solid fa-file-export"></i> EXCEL
                             </button>
                         </div>
                     </div>
 
-                    <div style="margin-bottom: 15px;">
-                        <input type="text" id="histSearch" class="input-search" placeholder="Cari data history (Global Search)..." onkeyup="renderHistory()">
+                    <div style="margin-bottom: 20px;">
+                        <input type="text" id="histSearch" class="input-search" placeholder="Cari data history (Global Search)..." onkeyup="renderHistory()" style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px;">
                     </div>
 
                     <div class="table-responsive">
-                        <table class="main-data-table" id="table-history-data">
+                        <table class="main-data-table" id="table-history-data" style="width: 100%;">
                             <thead>
                                 <tr>
-                                    <th style="width: 30px;"><input type="checkbox" id="checkAllHistory" onclick="toggleAllHistory(this)"></th>
-                                    <th>No</th>
-                                    <th>No DN</th>
-                                    <th>No SN</th>
-                                    <th>Plan Date</th>
-                                    <th>Vendor</th>
-                                    <th>Armada</th>
-                                    <th>Area</th>
-                                    <th>Kota</th>
-                                    <th>Customer</th>
-                                    <th>Qty (Kg)</th>
-                                    <th>Catatan</th>
-                                    <th>Outs</th>
-                                    <th>Gate In Time</th>
-                                    </tr>
+                                    <th style="width: 40px;"><input type="checkbox" id="checkAllHistory" onclick="toggleAllHistory(this)"></th>
+                                    <th>NO</th>
+                                    <th>NO DN</th>
+                                    <th>NO SN</th>
+                                    <th>PLAN DATE</th>
+                                    <th>VENDOR</th>
+                                    <th>ARMADA</th>
+                                    <th>AREA</th>
+                                    <th>KOTA</th>
+                                    <th>CUSTOMER</th>
+                                    <th>QTY (KG)</th>
+                                    <th>CATATAN</th>
+                                    <th>OUTS</th>
+                                    <th>GATE IN TIME</th>
+                                </tr>
                             </thead>
                             <tbody id="histTableBody"></tbody>
                         </table>
                     </div>
+
                 </div>
             </div>
             
@@ -1153,7 +1159,6 @@
 
     <script>
         // --- 1. FIREBASE CONFIGURATION ---
-        // Config tetap sama sesuai aslinya
         const firebaseConfig = {
           apiKey: "AIzaSyCTK_50YcaSmtDyJAFDXqdg9cFLFaI9CYI",
           authDomain: "indeco-ikk-logistik.firebaseapp.com",
@@ -1445,7 +1450,7 @@
             });
         }
 
-        // --- 7. ANALYSIS LOGIC ---
+        // --- 7. ANALYSIS LOGIC (SAME AS BEFORE) ---
         function updateAnalysis() {
             const selectedDateInput = document.getElementById('analysis-date').value;
             if(!selectedDateInput) return; 
@@ -1533,84 +1538,75 @@
 
             // Helper Render Breakdowns
             const renderIntegratedBreakdown = (targetId) => {
-    // Variabel untuk menampung total per kolom
-    let gt = {
-        tTrP:0, tTrR:0, tTlP:0, tTlR:0, tCoP:0, tCoR:0,
-        nTrP:0, nTrR:0, nTlP:0, nTlR:0, nCoP:0, nCoR:0
-    };
+                let gt = {
+                    tTrP:0, tTrR:0, tTlP:0, tTlR:0, tCoP:0, tCoR:0,
+                    nTrP:0, nTrR:0, nTlP:0, nTlR:0, nCoP:0, nCoR:0
+                };
 
-    let html = areas.map(a => {
-        const d = {
-            tTrP: stats[a].t_trP || 0, tTrR: stats[a].t_trR || 0,
-            tTlP: stats[a].t_tlP || 0, tTlR: stats[a].t_tlR || 0,
-            tCoP: stats[a].t_coP || 0, tCoR: stats[a].t_coR || 0,
-            nTrP: stats[a].nt_trP || 0, nTrR: stats[a].nt_trR || 0,
-            nTlP: stats[a].nt_tlP || 0, nTlR: stats[a].nt_tlR || 0,
-            nCoP: stats[a].nt_coP || 0, nCoR: stats[a].nt_coR || 0
-        };
+                let html = areas.map(a => {
+                    const d = {
+                        tTrP: stats[a].t_trP || 0, tTrR: stats[a].t_trR || 0,
+                        tTlP: stats[a].t_tlP || 0, tTlR: stats[a].t_tlR || 0,
+                        tCoP: stats[a].t_coP || 0, tCoR: stats[a].t_coR || 0,
+                        nTrP: stats[a].nt_trP || 0, nTrR: stats[a].nt_trR || 0,
+                        nTlP: stats[a].nt_tlP || 0, nTlR: stats[a].nt_tlR || 0,
+                        nCoP: stats[a].nt_coP || 0, nCoR: stats[a].nt_coR || 0
+                    };
 
-        // Update Grand Total
-        Object.keys(gt).forEach(key => gt[key] += d[key]);
+                    Object.keys(gt).forEach(key => gt[key] += d[key]);
 
-        // Helper fungsi untuk style Gap
-        const getGapStyle = (p, r) => {
-            const gap = p - r;
-            const bg = gap > 0 ? 'background-color: #fee2e2;' : 'background-color: #f0fdf4;';
-            const val = gap > 0 ? `-${gap}` : gap;
-            return `style="border: 1px solid #cbd5e1; color: #1e293b; font-weight: bold; ${bg}" data-val="${val}"`;
-        };
+                    const getGapStyle = (p, r) => {
+                        const gap = p - r;
+                        const bg = gap > 0 ? 'background-color: #fee2e2;' : 'background-color: #f0fdf4;';
+                        const val = gap > 0 ? `-${gap}` : gap;
+                        return `style="border: 1px solid #cbd5e1; color: #1e293b; font-weight: bold; ${bg}" data-val="${val}"`;
+                    };
 
-        const renderGap = (p, r) => {
-            const gap = p - r;
-            return gap > 0 ? `-${gap}` : gap;
-        };
+                    const renderGap = (p, r) => { const gap = p - r; return gap > 0 ? `-${gap}` : gap; };
 
-        return `
-            <tr style="background-color: white;">
-                <td style="text-align:left; padding-left:10px; font-weight:700; border: 1px solid #cbd5e1;">${a}</td>
-                
-                <td style="border: 1px solid #cbd5e1;">${d.tTrP}</td><td style="border: 1px solid #cbd5e1; font-weight:bold;">${d.tTrR}</td><td ${getGapStyle(d.tTrP, d.tTrR)}>${renderGap(d.tTrP, d.tTrR)}</td>
-                <td style="border: 1px solid #cbd5e1;">${d.tTlP}</td><td style="border: 1px solid #cbd5e1; font-weight:bold;">${d.tTlR}</td><td ${getGapStyle(d.tTlP, d.tTlR)}>${renderGap(d.tTlP, d.tTlR)}</td>
-                <td style="border: 1px solid #cbd5e1;">${d.tCoP}</td><td style="border: 1px solid #cbd5e1; font-weight:bold;">${d.tCoR}</td><td ${getGapStyle(d.tCoP, d.tCoR)}>${renderGap(d.tCoP, d.tCoR)}</td>
-                
-                <td style="border: 1px solid #cbd5e1;">${d.nTrP}</td><td style="border: 1px solid #cbd5e1; font-weight:bold;">${d.nTrR}</td><td ${getGapStyle(d.nTrP, d.nTrR)}>${renderGap(d.nTrP, d.nTrR)}</td>
-                <td style="border: 1px solid #cbd5e1;">${d.nTlP}</td><td style="border: 1px solid #cbd5e1; font-weight:bold;">${d.nTlR}</td><td ${getGapStyle(d.nTlP, d.nTlR)}>${renderGap(d.nTlP, d.nTlR)}</td>
-                <td style="border: 1px solid #cbd5e1;">${d.nCoP}</td><td style="border: 1px solid #cbd5e1; font-weight:bold;">${d.nCoR}</td><td ${getGapStyle(d.nCoP, d.nCoR)}>${renderGap(d.nCoP, d.nCoR)}</td>
-            </tr>`;
-    }).join('');
+                    return `
+                        <tr style="background-color: white;">
+                            <td style="text-align:left; padding-left:10px; font-weight:700; border: 1px solid #cbd5e1;">${a}</td>
+                            <td style="border: 1px solid #cbd5e1;">${d.tTrP}</td><td style="border: 1px solid #cbd5e1; font-weight:bold;">${d.tTrR}</td><td ${getGapStyle(d.tTrP, d.tTrR)}>${renderGap(d.tTrP, d.tTrR)}</td>
+                            <td style="border: 1px solid #cbd5e1;">${d.tTlP}</td><td style="border: 1px solid #cbd5e1; font-weight:bold;">${d.tTlR}</td><td ${getGapStyle(d.tTlP, d.tTlR)}>${renderGap(d.tTlP, d.tTlR)}</td>
+                            <td style="border: 1px solid #cbd5e1;">${d.tCoP}</td><td style="border: 1px solid #cbd5e1; font-weight:bold;">${d.tCoR}</td><td ${getGapStyle(d.tCoP, d.tCoR)}>${renderGap(d.tCoP, d.tCoR)}</td>
+                            
+                            <td style="border: 1px solid #cbd5e1;">${d.nTrP}</td><td style="border: 1px solid #cbd5e1; font-weight:bold;">${d.nTrR}</td><td ${getGapStyle(d.nTrP, d.nTrR)}>${renderGap(d.nTrP, d.nTrR)}</td>
+                            <td style="border: 1px solid #cbd5e1;">${d.nTlP}</td><td style="border: 1px solid #cbd5e1; font-weight:bold;">${d.nTlR}</td><td ${getGapStyle(d.nTlP, d.nTlR)}>${renderGap(d.nTlP, d.nTlR)}</td>
+                            <td style="border: 1px solid #cbd5e1;">${d.nCoP}</td><td style="border: 1px solid #cbd5e1; font-weight:bold;">${d.nCoR}</td><td ${getGapStyle(d.nCoP, d.nCoR)}>${renderGap(d.nCoP, d.nCoR)}</td>
+                        </tr>`;
+                }).join('');
 
-    // TAMBAHKAN BARIS GRAND TOTAL
-    const createGapTotal = (p, r) => {
-        const gap = p - r;
-        const bg = gap > 0 ? 'background-color: #fca5a5;' : 'background-color: #86efac;';
-        const val = gap > 0 ? `-${gap}` : gap;
-        return `<td style="border: 1px solid #475569; color: black; font-weight: 900; ${bg}">${val}</td>`;
-    };
+                const createGapTotal = (p, r) => {
+                    const gap = p - r;
+                    const bg = gap > 0 ? 'background-color: #fca5a5;' : 'background-color: #86efac;';
+                    const val = gap > 0 ? `-${gap}` : gap;
+                    return `<td style="border: 1px solid #475569; color: black; font-weight: 900; ${bg}">${val}</td>`;
+                };
 
-    html += `
-        <tr style="background-color: #f1f5f9; font-weight: 800;">
-            <td style="border: 1px solid #475569; text-align: center;">GRAND TOTAL</td>
-            
-            <td style="border: 1px solid #475569;">${gt.tTrP}</td><td style="border: 1px solid #475569;">${gt.tTrR}</td>${createGapTotal(gt.tTrP, gt.tTrR)}
-            <td style="border: 1px solid #475569;">${gt.tTlP}</td><td style="border: 1px solid #475569;">${gt.tTlR}</td>${createGapTotal(gt.tTlP, gt.tTlR)}
-            <td style="border: 1px solid #475569;">${gt.tCoP}</td><td style="border: 1px solid #475569;">${gt.tCoR}</td>${createGapTotal(gt.tCoP, gt.tCoR)}
-            
-            <td style="border: 1px solid #475569;">${gt.nTrP}</td><td style="border: 1px solid #475569;">${gt.nTrR}</td>${createGapTotal(gt.nTrP, gt.nTrR)}
-            <td style="border: 1px solid #475569;">${gt.nTlP}</td><td style="border: 1px solid #475569;">${gt.nTlR}</td>${createGapTotal(gt.nTlP, gt.nTlR)}
-            <td style="border: 1px solid #475569;">${gt.nCoP}</td><td style="border: 1px solid #475569;">${gt.nCoR}</td>${createGapTotal(gt.nCoP, gt.nCoR)}
-        </tr>`;
+                html += `
+                    <tr style="background-color: #f1f5f9; font-weight: 800;">
+                        <td style="border: 1px solid #475569; text-align: center;">GRAND TOTAL</td>
+                        
+                        <td style="border: 1px solid #475569;">${gt.tTrP}</td><td style="border: 1px solid #475569;">${gt.tTrR}</td>${createGapTotal(gt.tTrP, gt.tTrR)}
+                        <td style="border: 1px solid #475569;">${gt.tTlP}</td><td style="border: 1px solid #475569;">${gt.tTlR}</td>${createGapTotal(gt.tTlP, gt.tTlR)}
+                        <td style="border: 1px solid #475569;">${gt.tCoP}</td><td style="border: 1px solid #475569;">${gt.tCoR}</td>${createGapTotal(gt.tCoP, gt.tCoR)}
+                        
+                        <td style="border: 1px solid #475569;">${gt.nTrP}</td><td style="border: 1px solid #475569;">${gt.nTrR}</td>${createGapTotal(gt.nTrP, gt.nTrR)}
+                        <td style="border: 1px solid #475569;">${gt.nTlP}</td><td style="border: 1px solid #475569;">${gt.nTlR}</td>${createGapTotal(gt.nTlP, gt.nTlR)}
+                        <td style="border: 1px solid #475569;">${gt.nCoP}</td><td style="border: 1px solid #475569;">${gt.nCoR}</td>${createGapTotal(gt.nCoP, gt.nCoR)}
+                    </tr>`;
 
-    document.getElementById(targetId).innerHTML = html;
-};
+                document.getElementById(targetId).innerHTML = html;
+            };
 
-// Eksekusi
-renderIntegratedBreakdown('body-breakdown-integrated');
+            renderIntegratedBreakdown('body-breakdown-integrated');
 
             let gapUnit = selfPickup.pUnit - selfPickup.rUnit;
             document.getElementById('body-ambil-sendiri').innerHTML = `<tr><th style="width:40%;">PRODUK</th><th>PLAN</th><th>REALISASI</th><th>GAP</th></tr><tr><td style="text-align:left; padding-left:10px; font-weight:bold;">BROWN</td><td>${b(selfPickup.pUnit)}</td><td style="font-weight:bold;">${b(selfPickup.rUnit)}</td><td class="${gapUnit > 0 ? 'gap-alert' : 'gap-safe'}">${b(gapUnit > 0 ? `-${gapUnit}` : gapUnit)}</td></tr>`;
         }
 
-        // --- 8. PLANNING FUNCTIONS ---
+        // --- 8. PLANNING FUNCTIONS (SAME) ---
         async function processBulkPlanning() {
             const rawData = document.getElementById('p-bulk-data').value.trim();
             let vendorName = document.getElementById('p-bulk-vendor').value.trim() || "BELUM BOOKING";
@@ -1647,7 +1643,6 @@ renderIntegratedBreakdown('body-breakdown-integrated');
                 else if(rawArmada.length > 2) armadaType = rawArmada; 
 
                 const note1 = cols[7] ? cols[7].trim() : "";
-                // Gabungkan catatan dari Excel dan catatan manual di dashboard untuk dicek
                 let fullNoteText = (note1 + " " + manualNote).toUpperCase();
                 
                 let isSelfPickup = fullNoteText.includes("AMBIL SENDIRI");
@@ -1657,11 +1652,9 @@ renderIntegratedBreakdown('body-breakdown-integrated');
                 let finalArea = selectedArea;
 
                 if (isSelfPickup) { 
-                    // Jika AMBIL SENDIRI, otomatis isi Catatan DAN Area
                     finalNote = "AMBIL SENDIRI"; 
                     finalArea = "AMBIL SENDIRI"; 
                 } else if (isNextDay) {
-                    // Jika NEXT DAY, hanya isi Catatan saja (Area tetap sesuai pilihan dropdown)
                     finalNote = "NEXT DAY";
                 }
 
@@ -1988,11 +1981,9 @@ renderIntegratedBreakdown('body-breakdown-integrated');
                 const ref = db.collection("monitoring").doc(docId);
                 
                 if (item && item.status === 'Gate In') {
-                    // Soft Delete: Archive it so it stays in History but leaves Monitoring
                     batch.update(ref, { archived: true });
                     archivedCount++;
                 } else {
-                    // Hard Delete: Cancelled or Planning data is removed completely
                     batch.delete(ref);
                     deletedCount++;
                 }
@@ -2080,7 +2071,7 @@ renderIntegratedBreakdown('body-breakdown-integrated');
             const originalShadow = container.style.boxShadow;
             container.style.boxShadow = 'none';
             container.style.padding = '40px'; 
-            html2canvas(container, { scale: 3 }).then(canvas => { // Scale upgraded
+            html2canvas(container, { scale: 3 }).then(canvas => { 
                 const link = document.createElement('a');
                 link.download = 'ANALISIS_LOGISTIK_INDECO.jpg';
                 link.href = canvas.toDataURL('image/jpeg', 1.0);
@@ -2109,15 +2100,13 @@ renderIntegratedBreakdown('body-breakdown-integrated');
             const filterVal = document.getElementById('filterStatus') ? document.getElementById('filterStatus').value : "";
             let subTitleText = filterVal ? `STATUS : ${filterVal.toUpperCase()}` : "SEMUA STATUS";
             
-            // WRAPPER KHUSUS UTK RENDER HD
             const wrapper = document.createElement('div');
             wrapper.style.position = "fixed"; 
-            wrapper.style.left = "-10000px"; // Sembunyikan dari layar
+            wrapper.style.left = "-10000px"; 
             wrapper.style.top = "0"; 
             wrapper.style.zIndex = "9999";
             wrapper.style.backgroundColor = "#ffffff"; 
             wrapper.style.padding = "50px"; 
-            // FORCE WIDTH BESAR (Desktop Resolution) agar tidak gepeng di mobile
             wrapper.style.width = "1920px"; 
             wrapper.style.fontFamily = "'Inter', sans-serif";
             document.body.appendChild(wrapper);
@@ -2131,7 +2120,6 @@ renderIntegratedBreakdown('body-breakdown-integrated');
             tableClone.style.width = "100%"; 
             tableClone.style.borderCollapse = "collapse"; 
             
-            // Pastikan saat dirender image, status pill kembali lurus (horizontal)
             const pills = tableClone.querySelectorAll('.status-pill');
             pills.forEach(p => { 
                 p.style.whiteSpace = "nowrap"; 
@@ -2156,7 +2144,6 @@ renderIntegratedBreakdown('body-breakdown-integrated');
             wrapper.appendChild(tableClone);
             
             setTimeout(() => {
-                // Gunakan Scale tinggi (3) dan windowWidth desktop
                 html2canvas(wrapper, { scale: 3, backgroundColor: "#ffffff", windowWidth: 1920 }).then(canvas => {
                     const link = document.createElement('a');
                     link.download = `LAPORAN_${subTitleText.replace(/\s|:/g, '_')}.jpg`;
