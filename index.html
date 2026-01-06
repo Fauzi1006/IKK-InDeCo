@@ -317,29 +317,31 @@
         /* --- 7. TABLE STYLES --- */
         .table-responsive { 
             width: 100%; 
-            overflow-x: hidden;
+            overflow-x: auto; /* Allow Scroll */
             border: 1px solid #334155; 
             background: #ffffff;
             margin-bottom: 10px;
+            -webkit-overflow-scrolling: touch; /* Smooth scroll on mobile */
         }
 
         .main-data-table { 
             width: 100%; 
             border-collapse: collapse; 
-            table-layout: fixed; 
+            /* REVISI: Hapus fixed layout agar fleksibel di mobile */
+            /* table-layout: fixed; */
+            min-width: 1000px; /* Force min width so it scrolls instead of squishing */
         }
 
         .main-data-table th, 
         .main-data-table td { 
-            padding: 6px 4px; 
+            padding: 8px 6px; 
             border: 2px solid #cbd5e1;
-            font-size: 0.7rem; 
+            font-size: 0.75rem; 
             text-align: center !important; 
             vertical-align: middle !important; 
-            white-space: normal !important; 
+            white-space: normal !important; /* Allow Wrap */
             word-wrap: break-word !important; 
-            overflow-wrap: break-word !important;
-            line-height: 1.2;
+            line-height: 1.3;
         }
 
         .main-data-table th { 
@@ -351,55 +353,35 @@
             height: 40px;
         }
 
-        /* Column Widths */
-        .main-data-table th:nth-child(1), .main-data-table td:nth-child(1) { width: 3%; }
-        .main-data-table th:nth-child(2), .main-data-table td:nth-child(2) { width: 3%; }
-        .main-data-table th:nth-child(13), .main-data-table td:nth-child(13) { width: 4%; }
-        .main-data-table th:last-child, .main-data-table td:last-child { width: 4%; }
-
-        .main-data-table th:nth-child(3), .main-data-table td:nth-child(3) { width: 10%; font-weight: bold; color: #2563eb; }
-        .main-data-table th:nth-child(4), .main-data-table td:nth-child(4) { width: 7%; }
-        .main-data-table th:nth-child(5), .main-data-table td:nth-child(5) { width: 7%; }
-
-        .main-data-table th:nth-child(6), .main-data-table td:nth-child(6) { width: 6%; }
-        .main-data-table th:nth-child(7), .main-data-table td:nth-child(7) { width: 6%; }
-        .main-data-table th:nth-child(8), .main-data-table td:nth-child(8) { width: 8%; }
-        .main-data-table th:nth-child(9), .main-data-table td:nth-child(9) { width: 10%; }
-
-        .main-data-table th:nth-child(10), .main-data-table td:nth-child(10) { width: 11%; }
-        .main-data-table th:nth-child(12), .main-data-table td:nth-child(12) { width: 9%; }
-
-        .main-data-table th:nth-child(11), .main-data-table td:nth-child(11) { width: 6%; }
-        .main-data-table th:nth-child(14), .main-data-table td:nth-child(14) { width: 6%; }
-        .main-data-table th:nth-child(15), .main-data-table td:nth-child(15) { width: 6%; }
-
+        /* Responsive Column Widths (Desktop base) */
+        .main-data-table th:nth-child(1), .main-data-table td:nth-child(1) { width: 40px; }
+        .main-data-table th:nth-child(2), .main-data-table td:nth-child(2) { width: 40px; }
+        
+        /* Sticky Header */
         .main-data-table thead th {
             position: sticky;
             top: 0;
             z-index: 10;
         }
 
+        /* STATUS PILL STYLE */
         .status-pill { 
-            padding: 4px 10px; 
-            border-radius: 12px; 
+            padding: 4px 8px; 
+            border-radius: 8px; 
             font-size: 0.65rem; 
             font-weight: 800; 
             text-transform: uppercase; 
             display: inline-block; 
             text-align: center; 
-            white-space: nowrap; 
-        }
-
-        .status-planning { 
-            background: #dbeafe; 
-            color: #1e40af; 
-            border: 1px solid #fdac93; 
+            
+            /* PENTING: Agar bisa wrap di mobile */
             white-space: normal !important; 
-            word-spacing: 100vw; 
-            line-height: 1.1;
-            padding: 6px 4px;
+            word-break: break-word;
+            min-width: 80px; /* Min width agar teks tidak terlalu gepeng */
+            line-height: 1.2;
         }
 
+        .status-planning { background: #dbeafe; color: #1e40af; border: 1px solid #fdac93; }
         .status-gatein { background: #fef08a; color: #854d0e; border: 1px solid #facc15; }
         .status-cancelled { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
 
@@ -436,6 +418,15 @@
         .btn-pro-excel { background: #059669; color: white; }
         .btn-pro-reset { background: #dc2626; color: white; }
         
+        /* Tombol Update Status di Tabel */
+        .btn-status-trigger {
+            white-space: normal !important; /* Allow wrap */
+            text-align: center;
+            line-height: 1.2;
+            padding: 6px 4px !important;
+            max-width: 100px;
+        }
+
         .btn-action { 
             width: 26px; height: 26px; 
             border-radius: 4px; border:none; 
@@ -488,19 +479,59 @@
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .text-outstanding { color: #c2410c; font-size: 0.65rem; font-style: italic; font-weight: 600; display: block; margin-top:2px;}
         
+        /* --- MEDIA QUERIES KHUSUS MOBILE & RESPONSIVENESS --- */
         @media (max-width: 768px) {
             :root { --sidebar-collapsed-width: 0px; }
             body:not(.sidebar-hidden) .sidebar { width: 100%; max-width: 280px; }
             header { left: 0 !important; }
             .main-content { margin-left: 0 !important; padding: calc(var(--header-height) + 15px) 15px calc(var(--footer-height) + 15px); }
             footer { left: 0 !important; }
+            
+            /* Grid Layouts to 1 Column */
             .dash-stats-grid, .top-stats-bar, .dash-charts-container { grid-template-columns: 1fr; }
             .form-grid-mobile { grid-template-columns: 1fr !important; }
-            .table-responsive { overflow-x: auto; }
-            .main-data-table { min-width: 800px; } 
+            
+            /* Table Optimization for Mobile */
+            .table-responsive { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            /* Min-width ensures scroll instead of break */
+            .main-data-table { min-width: 900px; } 
+
             .status-buttons-container { flex-direction: column; }
             
+            /* Hide Login Illustration on Mobile */
             body[data-logged-in="true"] #login-page { display: none !important; }
+
+            /* FORCE VERTICAL STACK FOR STATUS & BUTTONS */
+            .status-pill {
+                white-space: normal !important; /* Allow wrapping */
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                width: 70px; /* Force small width to trigger break */
+                margin: 0 auto;
+                line-height: 1.1;
+                font-size: 0.6rem;
+                padding: 4px 2px;
+            }
+
+            .btn-status-trigger {
+                white-space: normal !important;
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                width: 70px; /* Force small width */
+                margin: 0 auto;
+                font-size: 0.6rem !important;
+                line-height: 1.1;
+            }
+
+            /* Adjust Table Padding */
+            .main-data-table th, .main-data-table td {
+                padding: 5px 2px;
+                font-size: 0.7rem;
+            }
         }
     </style>
 </head>
@@ -937,61 +968,41 @@
                     </div>
                     
                     <div style="margin-top: 30px; border-top: 2px dashed #cbd5e1; padding-top: 20px;">
-                        <div class="theme-blue" style="margin-bottom: 20px;">
-                            <div class="table-header-title">🔵 BREAKDOWN DETAIL: PLANNING </div>
-                            <div class="table-responsive">
-                                <table class="combined-table analysis-table">
-                                    <thead>
-                                        <tr>
-                                            <th rowspan="2" style="width:14%">AREA</th>
-                                            <th colspan="3">TRONTON</th>
-                                            <th colspan="3">TRAILER</th>
-                                            <th colspan="3">CONTAINER</th>
-                                            <th colspan="3">TONASE (KG)</th>
-                                        </tr>
-                                        <tr>
-                                            <th>PLAN</th><th>REALZ</th><th>GAP</th>
-                                            <th>PLAN</th><th>REALZ</th><th>GAP</th>
-                                            <th>PLAN</th><th>REALZ</th><th>GAP</th>
-                                            <th>PLAN</th><th>REALZ</th><th>GAP</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="body-breakdown-today"></tbody>
-                                </table>
-                            </div>
-                        </div>
+    <div class="theme-dark" style="margin-bottom: 20px;">
+        <div class="table-header-title">📊 UNIT BREAKDOWN : PLAN & NEXT DAY</div>
+        <div class="table-responsive">
+            <table class="combined-table analysis-table" style="border-collapse: collapse; width: 100%; text-align: center; font-size: 0.85rem; background-color: white;">
+                <thead>
+                    <tr style="color: white;">
+                        <th rowspan="3" style="border: 1px solid #cbd5e1; background-color: #1e293b; width: 10%;">AREA</th>
+                        <th colspan="9" style="border: 1px solid #cbd5e1; background-color: #1e3a8a;">PLAN DELIVERY</th>
+                        <th colspan="9" style="border: 1px solid #cbd5e1; background-color: #ea580c;">CARGO NEXT DAY</th>
+                    </tr>
+                    <tr style="color: white;">
+                        <th colspan="3" style="border: 1px solid #cbd5e1; background-color: #2563eb;">TRONTON</th>
+                        <th colspan="3" style="border: 1px solid #cbd5e1; background-color: #2563eb;">TRAILER</th>
+                        <th colspan="3" style="border: 1px solid #cbd5e1; background-color: #2563eb;">CONTAINER</th>
                         
-                        <div class="theme-orange" style="margin-bottom: 20px;">
-                            <div class="table-header-title">🟠 BREAKDOWN DETAIL: NEXT DAY</div>
-                            <div class="table-responsive">
-                                <table class="combined-table analysis-table">
-                                    <thead>
-                                        <tr>
-                                            <th rowspan="2" style="width:14%">AREA</th>
-                                            <th colspan="3">TRONTON</th><th colspan="3">TRAILER</th><th colspan="3">CONTAINER</th><th colspan="3">TONASE (KG)</th>
-                                        </tr>
-                                        <tr><th>PLAN</th><th>REALZ</th><th>GAP</th><th>PLAN</th><th>REALZ</th><th>GAP</th><th>PLAN</th><th>REALZ</th><th>GAP</th><th>PLAN</th><th>REALZ</th><th>GAP</th></tr>
-                                    </thead>
-                                    <tbody id="body-breakdown-next"></tbody>
-                                </table>
-                            </div>
-                        </div>
+                        <th colspan="3" style="border: 1px solid #cbd5e1; background-color: #f59e0b;">TRONTON</th>
+                        <th colspan="3" style="border: 1px solid #cbd5e1; background-color: #f59e0b;">TRAILER</th>
+                        <th colspan="3" style="border: 1px solid #cbd5e1; background-color: #f59e0b;">CONTAINER</th>
+                    </tr>
+                    <tr style="background-color: #f8fafc; font-size: 0.75rem; font-weight: bold;">
+                        <th style="border: 1px solid #cbd5e1;">P</th><th style="border: 1px solid #cbd5e1;">R</th><th style="border: 1px solid #cbd5e1;">G</th>
+                        <th style="border: 1px solid #cbd5e1;">P</th><th style="border: 1px solid #cbd5e1;">R</th><th style="border: 1px solid #cbd5e1;">G</th>
+                        <th style="border: 1px solid #cbd5e1;">P</th><th style="border: 1px solid #cbd5e1;">R</th><th style="border: 1px solid #cbd5e1;">G</th>
                         
-                        <div class="theme-green" style="margin-bottom: 20px;">
-                            <div class="table-header-title">🟢 BREAKDOWN SUMMARY (TOTAL OPS)</div>
-                            <div class="table-responsive">
-                                <table class="combined-table analysis-table">
-                                    <thead>
-                                        <tr>
-                                            <th rowspan="2" style="width:14%">AREA</th>
-                                            <th colspan="3">TRONTON</th><th colspan="3">TRAILER</th><th colspan="3">CONTAINER</th><th colspan="3">TONASE (KG)</th>
-                                        </tr>
-                                        <tr><th>PLAN</th><th>REALZ</th><th>GAP</th><th>PLAN</th><th>REALZ</th><th>GAP</th><th>PLAN</th><th>REALZ</th><th>GAP</th><th>PLAN</th><th>REALZ</th><th>GAP</th></tr>
-                                    </thead>
-                                    <tbody id="body-breakdown-summary"></tbody>
-                                </table>
-                            </div>
-                        </div>
+                        <th style="border: 1px solid #cbd5e1;">P</th><th style="border: 1px solid #cbd5e1;">R</th><th style="border: 1px solid #cbd5e1;">G</th>
+                        <th style="border: 1px solid #cbd5e1;">P</th><th style="border: 1px solid #cbd5e1;">R</th><th style="border: 1px solid #cbd5e1;">G</th>
+                        <th style="border: 1px solid #cbd5e1;">P</th><th style="border: 1px solid #cbd5e1;">R</th><th style="border: 1px solid #cbd5e1;">G</th>
+                    </tr>
+                </thead>
+                <tbody id="body-breakdown-integrated">
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
                         <div class="theme-dark" style="width: 300px;">
                             <div class="table-header-title">⚫ AMBIL SENDIRI </div>
@@ -1004,65 +1015,65 @@
             </div>
 
             <div id="page-history" class="page">
-    <div class="card">
-        <h3 style="margin-top:0; border-bottom: 1px solid #e2e8f0; padding-bottom:10px;">
-            <i class="fa-solid fa-database"></i> Database History (Selesai/Gate In)
-        </h3>
-        
-        <div class="history-controls">
-            <div style="flex: 1; display:flex; gap:10px; flex-wrap:wrap;">
-                <div>
-                    <label>Dari Tanggal</label>
-                    <input type="date" id="hist-start">
-                </div>
-                <div>
-                    <label>Sampai Tanggal</label>
-                    <input type="date" id="hist-end">
-                </div>
-                <div style="display:flex; align-items:end;">
-                    <button class="btn btn-primary" onclick="renderHistory()"><i class="fa-solid fa-search"></i> CARI</button>
+                <div class="card">
+                    <h3 style="margin-top:0; border-bottom: 1px solid #e2e8f0; padding-bottom:10px;">
+                        <i class="fa-solid fa-database"></i> Database History (Selesai/Gate In)
+                    </h3>
+                    
+                    <div class="history-controls">
+                        <div style="flex: 1; display:flex; gap:10px; flex-wrap:wrap;">
+                            <div>
+                                <label>Dari Tanggal</label>
+                                <input type="date" id="hist-start">
+                            </div>
+                            <div>
+                                <label>Sampai Tanggal</label>
+                                <input type="date" id="hist-end">
+                            </div>
+                            <div style="display:flex; align-items:end;">
+                                <button class="btn btn-primary" onclick="renderHistory()"><i class="fa-solid fa-search"></i> CARI</button>
+                            </div>
+                        </div>
+                        
+                        <div style="display:flex; gap:10px; align-items:end;">
+                            <button class="btn btn-pro-reset" onclick="deleteSelectedHistory()" style="background-color: #ef4444;">
+                                <i class="fa-solid fa-trash-can"></i> HAPUS TERPILIH
+                            </button>
+                            <button class="btn btn-pro-excel" onclick="exportHistoryExcel()">
+                                <i class="fa-solid fa-file-export"></i> EXCEL
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="margin-bottom: 15px;">
+                        <input type="text" id="histSearch" class="input-search" placeholder="Cari data history (Global Search)..." onkeyup="renderHistory()">
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="main-data-table" id="table-history-data">
+                            <thead>
+                                <tr>
+                                    <th style="width: 30px;"><input type="checkbox" id="checkAllHistory" onclick="toggleAllHistory(this)"></th>
+                                    <th>No</th>
+                                    <th>No DN</th>
+                                    <th>No SN</th>
+                                    <th>Plan Date</th>
+                                    <th>Vendor</th>
+                                    <th>Armada</th>
+                                    <th>Area</th>
+                                    <th>Kota</th>
+                                    <th>Customer</th>
+                                    <th>Qty (Kg)</th>
+                                    <th>Catatan</th>
+                                    <th>Outs</th>
+                                    <th>Gate In Time</th>
+                                    </tr>
+                            </thead>
+                            <tbody id="histTableBody"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
-            
-            <div style="display:flex; gap:10px; align-items:end;">
-                <button class="btn btn-pro-reset" onclick="deleteSelectedHistory()" style="background-color: #ef4444;">
-                    <i class="fa-solid fa-trash-can"></i> HAPUS TERPILIH
-                </button>
-                <button class="btn btn-pro-excel" onclick="exportHistoryExcel()">
-                    <i class="fa-solid fa-file-export"></i> EXCEL
-                </button>
-            </div>
-        </div>
-
-        <div style="margin-bottom: 15px;">
-            <input type="text" id="histSearch" class="input-search" placeholder="Cari data history (Global Search)..." onkeyup="renderHistory()">
-        </div>
-
-        <div class="table-responsive">
-            <table class="main-data-table" id="table-history-data">
-                <thead>
-                    <tr>
-                        <th style="width: 30px;"><input type="checkbox" id="checkAllHistory" onclick="toggleAllHistory(this)"></th>
-                        <th>No</th>
-                        <th>No DN</th>
-                        <th>No SN</th>
-                        <th>Plan Date</th>
-                        <th>Vendor</th>
-                        <th>Armada</th>
-                        <th>Area</th>
-                        <th>Kota</th>
-                        <th>Customer</th>
-                        <th>Qty (Kg)</th>
-                        <th>Catatan</th>
-                        <th>Outs</th>
-                        <th>Gate In Time</th>
-                        </tr>
-                </thead>
-                <tbody id="histTableBody"></tbody>
-            </table>
-        </div>
-    </div>
-</div>
             
             <div id="page-route" class="page"><div class="card"><h3>📍 Route Planning Master</h3><p>Modul dalam pengembangan (Tersambung ke Firestore).</p></div></div>
             <div id="page-driver" class="page"><div class="card"><h3>👮 Driver Master Data</h3><p>Modul dalam pengembangan (Tersambung ke Firestore).</p></div></div>
@@ -1142,6 +1153,7 @@
 
     <script>
         // --- 1. FIREBASE CONFIGURATION ---
+        // Config tetap sama sesuai aslinya
         const firebaseConfig = {
           apiKey: "AIzaSyCTK_50YcaSmtDyJAFDXqdg9cFLFaI9CYI",
           authDomain: "indeco-ikk-logistik.firebaseapp.com",
@@ -1433,7 +1445,7 @@
             });
         }
 
-        // --- 7. ANALYSIS LOGIC (Revisi: Tampil meski data 0) ---
+        // --- 7. ANALYSIS LOGIC ---
         function updateAnalysis() {
             const selectedDateInput = document.getElementById('analysis-date').value;
             if(!selectedDateInput) return; 
@@ -1453,7 +1465,6 @@
             // Init Stats (Agar tabel selalu muncul meski data 0)
             areas.forEach(a => { stats[a] = { tP:0, tR:0, tQP:0, tQR:0, t_trP:0, t_trR:0, t_tlP:0, t_tlR:0, t_coP:0, t_coR:0, nP:0, nR:0, nQP:0, nQR:0, nt_trP:0, nt_trR:0, nt_tlP:0, nt_tlR:0, nt_coP:0, nt_coR:0 }; });
 
-            // Jika allShipments ada isinya, baru kita hitung. Jika tidak, loop ini tidak jalan dan nilai tetap 0.
             if(allShipments && allShipments.length > 0) {
                 allShipments.forEach(item => {
                     if(item.status === 'Cancelled') return;
@@ -1521,28 +1532,79 @@
             renderSimple('body-summary', 'summary');
 
             // Helper Render Breakdowns
-            const renderBreakdown = (targetId, type) => {
-                let total = { trP:0, trR:0, tlP:0, tlR:0, coP:0, coR:0, qP:0, qR:0 };
-                let html = areas.map(a => {
-                    let d = {};
-                    if (type === 'today') d = { trP: stats[a].t_trP, trR: stats[a].t_trR, tlP: stats[a].t_tlP, tlR: stats[a].t_tlR, coP: stats[a].t_coP, coR: stats[a].t_coR, qP: stats[a].tQP, qR: stats[a].tQR };
-                    else if (type === 'next') d = { trP: stats[a].nt_trP, trR: stats[a].nt_trR, tlP: stats[a].nt_tlP, tlR: stats[a].nt_tlR, coP: stats[a].nt_coP, coR: stats[a].nt_coR, qP: stats[a].nQP, qR: stats[a].nQR };
-                    else if (type === 'sum') d = { trP: stats[a].t_trP + stats[a].nt_trP, trR: stats[a].t_trR + stats[a].nt_trR, tlP: stats[a].t_tlP + stats[a].nt_tlP, tlR: stats[a].t_tlR + stats[a].nt_tlR, coP: stats[a].t_coP + stats[a].nt_coP, coR: stats[a].t_coR + stats[a].nt_coR, qP: stats[a].tQP + stats[a].nQP, qR: stats[a].tQR + stats[a].nQR };
-                    
-                    total.trP += d.trP; total.trR += d.trR; total.tlP += d.tlP; total.tlR += d.tlR; total.coP += d.coP; total.coR += d.coR; total.qP += d.qP; total.qR += d.qR;
-                    const gTr = d.trP - d.trR; const gTl = d.tlP - d.tlR; const gCo = d.coP - d.coR; const gQ = d.qP - d.qR;
-                    
-                    return `<tr><td style="text-align:left; padding-left:10px; font-weight:700;">${a}</td><td>${d.trP}</td><td style="font-weight:bold;">${d.trR}</td><td class="${gTr > 0 ? 'gap-alert' : 'gap-safe'}">${gTr > 0 ? `-${gTr}` : gTr}</td><td>${d.tlP}</td><td style="font-weight:bold;">${d.tlR}</td><td class="${gTl > 0 ? 'gap-alert' : 'gap-safe'}">${gTl > 0 ? `-${gTl}` : gTl}</td><td>${d.coP}</td><td style="font-weight:bold;">${d.coR}</td><td class="${gCo > 0 ? 'gap-alert' : 'gap-safe'}">${gCo > 0 ? `-${gCo}` : gCo}</td><td>${formatNumber(Math.round(d.qP))}</td><td style="font-weight:bold;">${formatNumber(Math.round(d.qR))}</td><td class="${gQ > 1 ? 'gap-alert' : 'gap-safe'}">${gQ > 1 ? `-${formatNumber(Math.round(gQ))}` : formatNumber(Math.round(gQ))}</td></tr>`;
-                }).join('');
-                
-                const gtTr = total.trP - total.trR; const gtTl = total.tlP - total.tlR; const gtCo = total.coP - total.coR; const gtQ = total.qP - total.qR;
-                html += `<tr class="row-total" style="background:#f1f5f9; border-top:2px solid #cbd5e1; font-weight:800;"><td>TOTAL</td><td>${total.trP}</td><td>${total.trR}</td><td class="${gtTr > 0 ? 'gap-alert' : 'gap-safe'}">${gtTr > 0 ? `-${gtTr}` : gtTr}</td><td>${total.tlP}</td><td>${total.tlR}</td><td class="${gtTl > 0 ? 'gap-alert' : 'gap-safe'}">${gtTl > 0 ? `-${gtTl}` : gtTl}</td><td>${total.coP}</td><td>${total.coR}</td><td class="${gtCo > 0 ? 'gap-alert' : 'gap-safe'}">${gtCo > 0 ? `-${gtCo}` : gtCo}</td><td>${formatNumber(Math.round(total.qP))}</td><td>${formatNumber(Math.round(total.qR))}</td><td class="${gtQ > 1 ? 'gap-alert' : 'gap-safe'}">${gtQ > 1 ? `-${formatNumber(Math.round(gtQ))}` : formatNumber(Math.round(gtQ))}</td></tr>`;
-                document.getElementById(targetId).innerHTML = html;
-            };
+            const renderIntegratedBreakdown = (targetId) => {
+    // Variabel untuk menampung total per kolom
+    let gt = {
+        tTrP:0, tTrR:0, tTlP:0, tTlR:0, tCoP:0, tCoR:0,
+        nTrP:0, nTrR:0, nTlP:0, nTlR:0, nCoP:0, nCoR:0
+    };
 
-            renderBreakdown('body-breakdown-today', 'today'); 
-            renderBreakdown('body-breakdown-next', 'next'); 
-            renderBreakdown('body-breakdown-summary', 'sum');
+    let html = areas.map(a => {
+        const d = {
+            tTrP: stats[a].t_trP || 0, tTrR: stats[a].t_trR || 0,
+            tTlP: stats[a].t_tlP || 0, tTlR: stats[a].t_tlR || 0,
+            tCoP: stats[a].t_coP || 0, tCoR: stats[a].t_coR || 0,
+            nTrP: stats[a].nt_trP || 0, nTrR: stats[a].nt_trR || 0,
+            nTlP: stats[a].nt_tlP || 0, nTlR: stats[a].nt_tlR || 0,
+            nCoP: stats[a].nt_coP || 0, nCoR: stats[a].nt_coR || 0
+        };
+
+        // Update Grand Total
+        Object.keys(gt).forEach(key => gt[key] += d[key]);
+
+        // Helper fungsi untuk style Gap
+        const getGapStyle = (p, r) => {
+            const gap = p - r;
+            const bg = gap > 0 ? 'background-color: #fee2e2;' : 'background-color: #f0fdf4;';
+            const val = gap > 0 ? `-${gap}` : gap;
+            return `style="border: 1px solid #cbd5e1; color: #1e293b; font-weight: bold; ${bg}" data-val="${val}"`;
+        };
+
+        const renderGap = (p, r) => {
+            const gap = p - r;
+            return gap > 0 ? `-${gap}` : gap;
+        };
+
+        return `
+            <tr style="background-color: white;">
+                <td style="text-align:left; padding-left:10px; font-weight:700; border: 1px solid #cbd5e1;">${a}</td>
+                
+                <td style="border: 1px solid #cbd5e1;">${d.tTrP}</td><td style="border: 1px solid #cbd5e1; font-weight:bold;">${d.tTrR}</td><td ${getGapStyle(d.tTrP, d.tTrR)}>${renderGap(d.tTrP, d.tTrR)}</td>
+                <td style="border: 1px solid #cbd5e1;">${d.tTlP}</td><td style="border: 1px solid #cbd5e1; font-weight:bold;">${d.tTlR}</td><td ${getGapStyle(d.tTlP, d.tTlR)}>${renderGap(d.tTlP, d.tTlR)}</td>
+                <td style="border: 1px solid #cbd5e1;">${d.tCoP}</td><td style="border: 1px solid #cbd5e1; font-weight:bold;">${d.tCoR}</td><td ${getGapStyle(d.tCoP, d.tCoR)}>${renderGap(d.tCoP, d.tCoR)}</td>
+                
+                <td style="border: 1px solid #cbd5e1;">${d.nTrP}</td><td style="border: 1px solid #cbd5e1; font-weight:bold;">${d.nTrR}</td><td ${getGapStyle(d.nTrP, d.nTrR)}>${renderGap(d.nTrP, d.nTrR)}</td>
+                <td style="border: 1px solid #cbd5e1;">${d.nTlP}</td><td style="border: 1px solid #cbd5e1; font-weight:bold;">${d.nTlR}</td><td ${getGapStyle(d.nTlP, d.nTlR)}>${renderGap(d.nTlP, d.nTlR)}</td>
+                <td style="border: 1px solid #cbd5e1;">${d.nCoP}</td><td style="border: 1px solid #cbd5e1; font-weight:bold;">${d.nCoR}</td><td ${getGapStyle(d.nCoP, d.nCoR)}>${renderGap(d.nCoP, d.nCoR)}</td>
+            </tr>`;
+    }).join('');
+
+    // TAMBAHKAN BARIS GRAND TOTAL
+    const createGapTotal = (p, r) => {
+        const gap = p - r;
+        const bg = gap > 0 ? 'background-color: #fca5a5;' : 'background-color: #86efac;';
+        const val = gap > 0 ? `-${gap}` : gap;
+        return `<td style="border: 1px solid #475569; color: black; font-weight: 900; ${bg}">${val}</td>`;
+    };
+
+    html += `
+        <tr style="background-color: #f1f5f9; font-weight: 800;">
+            <td style="border: 1px solid #475569; text-align: center;">GRAND TOTAL</td>
+            
+            <td style="border: 1px solid #475569;">${gt.tTrP}</td><td style="border: 1px solid #475569;">${gt.tTrR}</td>${createGapTotal(gt.tTrP, gt.tTrR)}
+            <td style="border: 1px solid #475569;">${gt.tTlP}</td><td style="border: 1px solid #475569;">${gt.tTlR}</td>${createGapTotal(gt.tTlP, gt.tTlR)}
+            <td style="border: 1px solid #475569;">${gt.tCoP}</td><td style="border: 1px solid #475569;">${gt.tCoR}</td>${createGapTotal(gt.tCoP, gt.tCoR)}
+            
+            <td style="border: 1px solid #475569;">${gt.nTrP}</td><td style="border: 1px solid #475569;">${gt.nTrR}</td>${createGapTotal(gt.nTrP, gt.nTrR)}
+            <td style="border: 1px solid #475569;">${gt.nTlP}</td><td style="border: 1px solid #475569;">${gt.nTlR}</td>${createGapTotal(gt.nTlP, gt.nTlR)}
+            <td style="border: 1px solid #475569;">${gt.nCoP}</td><td style="border: 1px solid #475569;">${gt.nCoR}</td>${createGapTotal(gt.nCoP, gt.nCoR)}
+        </tr>`;
+
+    document.getElementById(targetId).innerHTML = html;
+};
+
+// Eksekusi
+renderIntegratedBreakdown('body-breakdown-integrated');
 
             let gapUnit = selfPickup.pUnit - selfPickup.rUnit;
             document.getElementById('body-ambil-sendiri').innerHTML = `<tr><th style="width:40%;">PRODUK</th><th>PLAN</th><th>REALISASI</th><th>GAP</th></tr><tr><td style="text-align:left; padding-left:10px; font-weight:bold;">BROWN</td><td>${b(selfPickup.pUnit)}</td><td style="font-weight:bold;">${b(selfPickup.rUnit)}</td><td class="${gapUnit > 0 ? 'gap-alert' : 'gap-safe'}">${b(gapUnit > 0 ? `-${gapUnit}` : gapUnit)}</td></tr>`;
@@ -1707,9 +1769,7 @@
 
             let statTotal = 0, statBelumMasuk = 0, statGateIn = 0, statCancelled = 0, statTonase = 0;
 
-            // FILTER: HIDE ARCHIVED ITEMS
             const filteredForTable = allShipments.filter(item => {
-                // Sembunyikan item yang sudah di-archive (dihapus dari view monitoring)
                 if (item.archived) return false;
 
                 const allValues = Object.values(item).join(' ').toLowerCase();
@@ -1772,7 +1832,7 @@
                     <td style="font-weight:600; color:#d97706;">${item.catatan || '-'}</td>
                     <td>${outstandingDesc}</td>
                     <td><span class="status-pill ${statusClass}">${statusLabel}</span></td>
-                    <td><button class="btn-status-trigger btn btn-white" style="padding:4px 8px; font-size:0.7rem;" onclick="openStatusModal('${item.id}')">UPDATE STATUS</button></td>
+                    <td><button class="btn-status-trigger btn btn-white" onclick="openStatusModal('${item.id}')">UPDATE STATUS</button></td>
                     <td><button class="btn-action btn-edit" onclick="editItem('${item.id}')"><i class="fa-solid fa-pen"></i></button></td>
                 </tr>`;
             }).join('');
@@ -1780,99 +1840,88 @@
 
         // --- 10. HISTORY FUNCTIONS ---
         function renderHistory() {
-    const q = document.getElementById('histSearch').value.toLowerCase();
-    const start = document.getElementById('hist-start').value;
-    const end = document.getElementById('hist-end').value;
-    
-    // Filter data yang statusnya 'Gate In' atau 'Cancelled'
-    const filtered = allShipments.filter(d => {
-        const isFinished = (d.status === 'Gate In' || d.status === 'Cancelled');
-        if(!isFinished) return false;
+            const q = document.getElementById('histSearch').value.toLowerCase();
+            const start = document.getElementById('hist-start').value;
+            const end = document.getElementById('hist-end').value;
+            
+            const filtered = allShipments.filter(d => {
+                const isFinished = (d.status === 'Gate In' || d.status === 'Cancelled');
+                if(!isFinished) return false;
 
-        const allValues = Object.values(d).join(' ').toLowerCase();
-        const matchesSearch = allValues.includes(q);
-        let inRange = true;
-        if (start && end) inRange = d.date >= start && d.date <= end;
-        return matchesSearch && inRange;
-    });
-    
-    const tbody = document.getElementById('histTableBody');
-    
-    // Reset checkbox master saat render ulang
-    const checkAll = document.getElementById('checkAllHistory');
-    if(checkAll) checkAll.checked = false;
+                const allValues = Object.values(d).join(' ').toLowerCase();
+                const matchesSearch = allValues.includes(q);
+                let inRange = true;
+                if (start && end) inRange = d.date >= start && d.date <= end;
+                return matchesSearch && inRange;
+            });
+            
+            const tbody = document.getElementById('histTableBody');
+            
+            const checkAll = document.getElementById('checkAllHistory');
+            if(checkAll) checkAll.checked = false;
 
-    if(filtered.length === 0) { 
-        tbody.innerHTML = '<tr><td colspan="14" style="padding:20px; color:#64748b; font-style:italic; text-align:center;">Tidak ada data history pada periode ini.</td></tr>'; 
-        return; 
-    }
-    
-    tbody.innerHTML = filtered.map((item, index) => {
-        let outstandingDesc = '-';
-        if (item.originalDate && item.originalDate !== item.date) {
-            outstandingDesc = `<span class="text-outstanding">Outstanding dari<br>${item.originalDate}</span>`;
+            if(filtered.length === 0) { 
+                tbody.innerHTML = '<tr><td colspan="14" style="padding:20px; color:#64748b; font-style:italic; text-align:center;">Tidak ada data history pada periode ini.</td></tr>'; 
+                return; 
+            }
+            
+            tbody.innerHTML = filtered.map((item, index) => {
+                let outstandingDesc = '-';
+                if (item.originalDate && item.originalDate !== item.date) {
+                    outstandingDesc = `<span class="text-outstanding">Outstanding dari<br>${item.originalDate}</span>`;
+                }
+                
+                return `
+                <tr>
+                    <td><input type="checkbox" class="hist-check" value="${item.id}"></td>
+                    <td>${index + 1}</td>
+                    <td style="font-weight:bold; color:#2563eb;">${item.dns}</td>
+                    <td>${item.sn || '-'}</td>
+                    <td>${item.date}</td>
+                    <td>${item.vendor}</td>
+                    <td>${item.truck || '-'}</td>
+                    <td>${item.area}</td>
+                    <td>${item.city}</td>
+                    <td>${item.customer}</td>
+                    <td class="col-number">${formatNumber(item.qty)}</td>
+                    <td style="color:#d97706; font-weight:600;">${item.catatan || '-'}</td>
+                    <td>${outstandingDesc}</td>
+                    <td style="color:#0f172a; font-weight:600;">${item.gateInTime || '-'}</td>
+                </tr>`;
+            }).join('');
         }
-        
-        return `
-        <tr>
-            <td><input type="checkbox" class="hist-check" value="${item.id}"></td>
-            
-            <td>${index + 1}</td>
-            
-            <td style="font-weight:bold; color:#2563eb;">${item.dns}</td>
-            <td>${item.sn || '-'}</td>
-            <td>${item.date}</td>
-            <td>${item.vendor}</td>
-            <td>${item.truck || '-'}</td>
-            <td>${item.area}</td>
-            <td>${item.city}</td>
-            <td>${item.customer}</td>
-            <td class="col-number">${formatNumber(item.qty)}</td>
-            <td style="color:#d97706; font-weight:600;">${item.catatan || '-'}</td>
-            <td>${outstandingDesc}</td>
-            <td style="color:#0f172a; font-weight:600;">${item.gateInTime || '-'}</td>
-            
-            </tr>`;
-    }).join('');
-}
 
-// Fungsi untuk centang semua checkbox sekaligus
-function toggleAllHistory(source) {
-    const checkboxes = document.querySelectorAll('.hist-check');
-    checkboxes.forEach(c => c.checked = source.checked);
-}
+        function toggleAllHistory(source) {
+            const checkboxes = document.querySelectorAll('.hist-check');
+            checkboxes.forEach(c => c.checked = source.checked);
+        }
 
-// Fungsi untuk menghapus data yang dicentang
-async function deleteSelectedHistory() {
-    const selected = document.querySelectorAll('.hist-check:checked');
-    if (selected.length === 0) {
-        alert("Pilih data yang akan dihapus terlebih dahulu!");
-        return;
-    }
+        async function deleteSelectedHistory() {
+            const selected = document.querySelectorAll('.hist-check:checked');
+            if (selected.length === 0) {
+                alert("Pilih data yang akan dihapus terlebih dahulu!");
+                return;
+            }
 
-    if (!confirm(`Apakah Anda yakin ingin menghapus ${selected.length} data terpilih secara permanen dari database?`)) {
-        return;
-    }
+            if (!confirm(`Apakah Anda yakin ingin menghapus ${selected.length} data terpilih secara permanen dari database?`)) {
+                return;
+            }
 
-    const batch = db.batch();
-    selected.forEach(cb => {
-        // cb.value berisi item.id (ID dokumen Firebase)
-        const docRef = db.collection("monitoring").doc(cb.value);
-        batch.delete(docRef);
-    });
+            const batch = db.batch();
+            selected.forEach(cb => {
+                const docRef = db.collection("monitoring").doc(cb.value);
+                batch.delete(docRef);
+            });
 
-    try {
-        await batch.commit();
-        alert("Data berhasil dihapus!");
-        // Catatan: Karena kita menghapus langsung di Firebase, pastikan sistem Anda 
-        // melakukan fetch ulang data atau menghapus manual dari array 'allShipments'
-        // Jika sistem Anda menggunakan onSnapshot (realtime), tabel akan update otomatis.
-        renderHistory(); 
-    } catch (err) {
-        console.error("Delete Failed:", err);
-        alert("Gagal menghapus data.");
-    }
-}
+            try {
+                await batch.commit();
+                alert("Data berhasil dihapus!");
+                renderHistory(); 
+            } catch (err) {
+                console.error("Delete Failed:", err);
+                alert("Gagal menghapus data.");
+            }
+        }
 
         function exportHistoryExcel() {
             const table = document.getElementById('table-history-data');
@@ -2025,13 +2074,13 @@ async function deleteSelectedHistory() {
                 .catch(err => alert("Gagal update data: " + err.message));
         }
 
-        // --- 12. EXPORT UTILS ---
+        // --- 12. EXPORT UTILS (UPDATED FOR HD EXPORT) ---
         function exportGapImage() { 
             const container = document.getElementById('exportAreaContainer');
             const originalShadow = container.style.boxShadow;
             container.style.boxShadow = 'none';
             container.style.padding = '40px'; 
-            html2canvas(container, { scale: 2 }).then(canvas => { 
+            html2canvas(container, { scale: 3 }).then(canvas => { // Scale upgraded
                 const link = document.createElement('a');
                 link.download = 'ANALISIS_LOGISTIK_INDECO.jpg';
                 link.href = canvas.toDataURL('image/jpeg', 1.0);
@@ -2060,9 +2109,17 @@ async function deleteSelectedHistory() {
             const filterVal = document.getElementById('filterStatus') ? document.getElementById('filterStatus').value : "";
             let subTitleText = filterVal ? `STATUS : ${filterVal.toUpperCase()}` : "SEMUA STATUS";
             
+            // WRAPPER KHUSUS UTK RENDER HD
             const wrapper = document.createElement('div');
-            wrapper.style.position = "fixed"; wrapper.style.left = "-10000px"; wrapper.style.top = "0"; wrapper.style.zIndex = "9999";
-            wrapper.style.backgroundColor = "#ffffff"; wrapper.style.padding = "50px"; wrapper.style.width = "1400px"; wrapper.style.fontFamily = "'Inter', sans-serif";
+            wrapper.style.position = "fixed"; 
+            wrapper.style.left = "-10000px"; // Sembunyikan dari layar
+            wrapper.style.top = "0"; 
+            wrapper.style.zIndex = "9999";
+            wrapper.style.backgroundColor = "#ffffff"; 
+            wrapper.style.padding = "50px"; 
+            // FORCE WIDTH BESAR (Desktop Resolution) agar tidak gepeng di mobile
+            wrapper.style.width = "1920px"; 
+            wrapper.style.fontFamily = "'Inter', sans-serif";
             document.body.appendChild(wrapper);
             
             const headerBox = document.createElement('div');
@@ -2070,7 +2127,18 @@ async function deleteSelectedHistory() {
             wrapper.appendChild(headerBox);
             
             const tableClone = originalTable.cloneNode(true);
-            tableClone.removeAttribute('id'); tableClone.style.width = "100%"; tableClone.style.borderCollapse = "collapse"; 
+            tableClone.removeAttribute('id'); 
+            tableClone.style.width = "100%"; 
+            tableClone.style.borderCollapse = "collapse"; 
+            
+            // Pastikan saat dirender image, status pill kembali lurus (horizontal)
+            const pills = tableClone.querySelectorAll('.status-pill');
+            pills.forEach(p => { 
+                p.style.whiteSpace = "nowrap"; 
+                p.style.display = "inline-block"; 
+                p.style.width = "auto";
+            });
+
             const thead = tableClone.querySelector('thead'); if (thead) thead.style.display = "table-header-group"; 
             
             const headers = tableClone.querySelectorAll('th');
@@ -2088,14 +2156,15 @@ async function deleteSelectedHistory() {
             wrapper.appendChild(tableClone);
             
             setTimeout(() => {
-                html2canvas(wrapper, { scale: 2, backgroundColor: "#ffffff" }).then(canvas => {
+                // Gunakan Scale tinggi (3) dan windowWidth desktop
+                html2canvas(wrapper, { scale: 3, backgroundColor: "#ffffff", windowWidth: 1920 }).then(canvas => {
                     const link = document.createElement('a');
                     link.download = `LAPORAN_${subTitleText.replace(/\s|:/g, '_')}.jpg`;
                     link.href = canvas.toDataURL('image/jpeg', 0.9);
                     link.click();
                     document.body.removeChild(wrapper);
                 });
-            }, 100); 
+            }, 500); 
         }
     </script>
 </body>
