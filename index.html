@@ -461,6 +461,39 @@
 
         .dash-filter-bar, .analysis-control-bar, .history-controls { background: white; padding: 15px; border-radius: 10px; border: 1px solid #e2e8f0; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 20px; }
 
+        /* --- SMART FILTER CSS --- */
+        .smart-filter-box {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .sf-header {
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--color-primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .sf-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 10px;
+        }
+        .sf-grid input, .sf-grid select {
+            font-size: 0.75rem;
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            width: 100%;
+        }
+        .sf-grid input:focus, .sf-grid select:focus {
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+        }
+
         /* Analysis Tables */
         .gap-container-flex { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
         .gap-table-box { flex: 1; min-width: 300px; background: white; border-radius: 8px; overflow: hidden; border: 1px solid #e2e8f0; }
@@ -929,7 +962,7 @@
                         <div class="stat-new-card st-plan">
                             <div class="st-icon-box"><i class="fa-solid fa-truck"></i></div>
                             <div class="st-content">
-                                <h4>PLANNING (EXCL. SENDIRI)</h4>
+                                <h4>PLANNING DELIVERY</h4>
                                 <p id="s-row1-planning">0</p>
                             </div>
                         </div>
@@ -981,27 +1014,35 @@
                     </div>
                 </div>
 
-                <div class="analysis-control-bar" style="justify-content: space-between;">
-                    <div style="display:flex; gap:10px; flex: 1; align-items: center;">
-                        
-                        <select id="searchCategory" onchange="updateMonitoring()" style="width: auto; min-width: 130px; border-left: 4px solid var(--color-primary); font-weight: bold;">
-                            <option value="all">🔍 GLOBAL (SEMUA)</option>
-                            <option value="vendor">VENDOR / TRUK</option>
-                            <option value="armada">JENIS ARMADA</option>
-                            <option value="area">AREA TUJUAN</option>
-                            <option value="city">KOTA</option>
-                            <option value="customer">CUSTOMER</option>
-                            <option value="catatan">CATATAN</option>
+                <div class="smart-filter-box">
+                    <div class="sf-header">
+                        <i class="fa-solid fa-filter"></i> FILTER
+                    </div>
+                    <div class="sf-grid">
+                        <input type="text" id="sf-vendor" list="list-history-vendor" placeholder="Vendor..." onkeyup="updateMonitoring()">
+                        <input type="text" id="sf-armada" placeholder="Armada / Truck..." onkeyup="updateMonitoring()">
+                        <input type="text" id="sf-area" list="list-area-options" placeholder="Area..." onkeyup="updateMonitoring()">
+                        <input type="text" id="sf-city" placeholder="Kota..." onkeyup="updateMonitoring()">
+                        <input type="text" id="sf-customer" placeholder="Customer..." onkeyup="updateMonitoring()">
+                        <input type="text" id="sf-catatan" list="list-history-catatan" placeholder="Catatan..." onkeyup="updateMonitoring()">
+                        <select id="sf-outs" onchange="updateMonitoring()">
+                            <option value=""> Pilih</option>
+                            <option value="YES">Outstanding Only</option>
+                            <option value="NO">Sesuai Jadwal</option>
                         </select>
-
-                        <input type="text" id="monSearch" class="input-search" placeholder="Ketik kata kunci pencarian..." onkeyup="updateMonitoring()" style="flex:1;">
-                        
-                        <select id="filterStatus" onchange="updateMonitoring()" style="width: auto; min-width: 150px;">
+                        <button class="btn btn-white" onclick="resetSmartFilters()">
+                            <i class="fa-solid fa-rotate-left"></i> RESET
+                        </button>
+                    </div>
+                </div>
+                <div class="analysis-control-bar" style="justify-content: space-between;">
+                    <div style="display:flex; gap:10px; flex: 1;">
+                        <input type="text" id="monSearch" class="input-search" placeholder="🔍 Cari..." onkeyup="updateMonitoring()" style="flex:1;">
+                        <select id="filterStatus" onchange="updateMonitoring()" style="width: auto; min-width: 120px;">
                             <option value="">SEMUA STATUS</option>
                             <option value="Belum Masuk">BELUM MASUK</option>
                             <option value="Gate In">GATE IN</option>
                             <option value="Cancelled">CANCELLED</option>
-                            <option value="OUTSTANDING" style="color: #c2410c; font-weight: bold;">⚠️ OUTSTANDING (LEWAT PLAN)</option>
                         </select>
                     </div>
                     
@@ -1874,15 +1915,23 @@
 
         // --- 9. MONITORING FUNCTIONS ---
         function updateMonitoring() {
-            // --- UPDATED SEARCH LOGIC (SINGLE OPTION + TEXT) ---
-            const searchCategory = document.getElementById('searchCategory').value;
+            // -- ORIGINAL FILTERS --
             const q = document.getElementById('monSearch').value.toLowerCase();
             const filterVal = document.getElementById('filterStatus').value;
 
-            // Variables for the Statistics
-            let countTotalJobs = 0; 
-            let countRegularPlanning = 0; 
-            let countSelfPickup = 0; 
+            // -- NEW SMART FILTERS (sf-) --
+            const sfVendor = document.getElementById('sf-vendor').value.toLowerCase();
+            const sfArmada = document.getElementById('sf-armada').value.toLowerCase();
+            const sfArea = document.getElementById('sf-area').value.toLowerCase();
+            const sfCity = document.getElementById('sf-city').value.toLowerCase();
+            const sfCustomer = document.getElementById('sf-customer').value.toLowerCase();
+            const sfCatatan = document.getElementById('sf-catatan').value.toLowerCase();
+            const sfOuts = document.getElementById('sf-outs').value;
+
+            // Variables for the NEW Statistics
+            let countTotalJobs = 0; // Total Planning (All)
+            let countRegularPlanning = 0; // Planning (Excl Ambil Sendiri)
+            let countSelfPickup = 0; // Ambil Sendiri
             
             let countGateIn = 0;
             let countPending = 0;
@@ -1892,36 +1941,43 @@
             const filteredForTable = allShipments.filter(item => {
                 if (item.archived) return false;
 
-                // 1. Logic Status Filter (Termasuk logic khusus Outstanding)
+                // 1. Search Bar Logic
+                const allValues = Object.values(item).join(' ').toLowerCase();
+                const matchesSearch = allValues.includes(q);
+
+                // 2. Status Dropdown Logic
                 let matchesStatus = true; 
                 if (filterVal !== "") {
                     if (filterVal === 'Belum Masuk') matchesStatus = (item.status === 'Belum Masuk' || item.status === 'Planning');
-                    else if (filterVal === 'OUTSTANDING') matchesStatus = (item.originalDate && item.originalDate !== item.date);
                     else matchesStatus = (item.status === filterVal);
                 }
 
-                // 2. Logic Search Category
-                let matchesSearch = false;
+                // 3. Smart Filter Logics (AND Condition)
+                // Vendor
+                const matchVendor = !sfVendor || (item.vendor || "").toLowerCase().includes(sfVendor);
+                // Armada
+                const matchArmada = !sfArmada || (item.truck || "").toLowerCase().includes(sfArmada);
+                // Area
+                const matchArea = !sfArea || (item.area || "").toLowerCase().includes(sfArea);
+                // City
+                const matchCity = !sfCity || (item.city || "").toLowerCase().includes(sfCity);
+                // Customer
+                const matchCustomer = !sfCustomer || (item.customer || "").toLowerCase().includes(sfCustomer);
+                // Catatan
+                const matchCatatan = !sfCatatan || (item.catatan || "").toLowerCase().includes(sfCatatan);
                 
-                if (searchCategory === 'all') {
-                    // Global Search (Cari di semua value)
-                    const allValues = Object.values(item).join(' ').toLowerCase();
-                    matchesSearch = allValues.includes(q);
-                } else if (searchCategory === 'vendor') {
-                    matchesSearch = (item.vendor || "").toLowerCase().includes(q) || (item.truck || "").toLowerCase().includes(q);
-                } else if (searchCategory === 'armada') {
-                    matchesSearch = (item.truck || "").toLowerCase().includes(q);
-                } else if (searchCategory === 'area') {
-                    matchesSearch = (item.area || "").toLowerCase().includes(q);
-                } else if (searchCategory === 'city') {
-                    matchesSearch = (item.city || "").toLowerCase().includes(q);
-                } else if (searchCategory === 'customer') {
-                    matchesSearch = (item.customer || "").toLowerCase().includes(q);
-                } else if (searchCategory === 'catatan') {
-                    matchesSearch = (item.catatan || "").toLowerCase().includes(q);
+                // Outs Logic
+                let matchOuts = true;
+                if (sfOuts === 'YES') {
+                    // Hanya tampilkan yang Outstanding (Original Date ada dan beda dengan Current Date)
+                    matchOuts = (item.originalDate && item.originalDate !== item.date);
+                } else if (sfOuts === 'NO') {
+                    // Hanya tampilkan yang TIDAK Outstanding
+                    matchOuts = (!item.originalDate || item.originalDate === item.date);
                 }
 
-                return matchesStatus && matchesSearch;
+                // Combine All
+                return matchesSearch && matchesStatus && matchVendor && matchArmada && matchArea && matchCity && matchCustomer && matchCatatan && matchOuts;
             });
 
             filteredForTable.forEach(item => {
@@ -1959,7 +2015,7 @@
             const tableBody = document.getElementById('monTableBody');
 
             if (filteredForTable.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="16" style="padding: 40px; text-align: center; color: #94a3b8;"><i class="fa-solid fa-clipboard-list" style="font-size:3rem; margin-bottom:10px;"></i><br>DATA TIDAK DITEMUKAN</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="16" style="padding: 40px; text-align: center; color: #94a3b8;"><i class="fa-solid fa-clipboard-list" style="font-size:3rem; margin-bottom:10px;"></i><br>BELUM ADA DATA / TIDAK DITEMUKAN</td></tr>`;
                 return;
             }
 
@@ -1996,6 +2052,17 @@
                     <td><button class="btn-action btn-edit" onclick="editItem('${item.id}')"><i class="fa-solid fa-pen"></i></button></td>
                 </tr>`;
             }).join('');
+        }
+
+        function resetSmartFilters() {
+            document.getElementById('sf-vendor').value = "";
+            document.getElementById('sf-armada').value = "";
+            document.getElementById('sf-area').value = "";
+            document.getElementById('sf-city').value = "";
+            document.getElementById('sf-customer').value = "";
+            document.getElementById('sf-catatan').value = "";
+            document.getElementById('sf-outs').value = "";
+            updateMonitoring();
         }
 
         // --- 10. HISTORY FUNCTIONS ---
