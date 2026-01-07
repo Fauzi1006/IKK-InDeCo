@@ -980,14 +980,28 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="analysis-control-bar" style="justify-content: space-between;">
-                    <div style="display:flex; gap:10px; flex: 1;">
-                        <input type="text" id="monSearch" class="input-search" placeholder="🔍 Cari DN, Customer, Nopol..." onkeyup="updateMonitoring()" style="flex:1;">
-                        <select id="filterStatus" onchange="updateMonitoring()" style="width: auto; min-width: 120px;">
+                    <div style="display:flex; gap:10px; flex: 1; align-items: center;">
+                        
+                        <select id="searchCategory" onchange="updateMonitoring()" style="width: auto; min-width: 130px; border-left: 4px solid var(--color-primary); font-weight: bold;">
+                            <option value="all">🔍 GLOBAL (SEMUA)</option>
+                            <option value="vendor">VENDOR / TRUK</option>
+                            <option value="armada">JENIS ARMADA</option>
+                            <option value="area">AREA TUJUAN</option>
+                            <option value="city">KOTA</option>
+                            <option value="customer">CUSTOMER</option>
+                            <option value="catatan">CATATAN</option>
+                        </select>
+
+                        <input type="text" id="monSearch" class="input-search" placeholder="Ketik kata kunci pencarian..." onkeyup="updateMonitoring()" style="flex:1;">
+                        
+                        <select id="filterStatus" onchange="updateMonitoring()" style="width: auto; min-width: 150px;">
                             <option value="">SEMUA STATUS</option>
                             <option value="Belum Masuk">BELUM MASUK</option>
                             <option value="Gate In">GATE IN</option>
                             <option value="Cancelled">CANCELLED</option>
+                            <option value="OUTSTANDING" style="color: #c2410c; font-weight: bold;">⚠️ OUTSTANDING (LEWAT PLAN)</option>
                         </select>
                     </div>
                     
@@ -1860,13 +1874,15 @@
 
         // --- 9. MONITORING FUNCTIONS ---
         function updateMonitoring() {
+            // --- UPDATED SEARCH LOGIC (SINGLE OPTION + TEXT) ---
+            const searchCategory = document.getElementById('searchCategory').value;
             const q = document.getElementById('monSearch').value.toLowerCase();
             const filterVal = document.getElementById('filterStatus').value;
 
-            // Variables for the NEW Statistics
-            let countTotalJobs = 0; // Total Planning (All)
-            let countRegularPlanning = 0; // Planning (Excl Ambil Sendiri)
-            let countSelfPickup = 0; // Ambil Sendiri
+            // Variables for the Statistics
+            let countTotalJobs = 0; 
+            let countRegularPlanning = 0; 
+            let countSelfPickup = 0; 
             
             let countGateIn = 0;
             let countPending = 0;
@@ -1876,14 +1892,36 @@
             const filteredForTable = allShipments.filter(item => {
                 if (item.archived) return false;
 
-                const allValues = Object.values(item).join(' ').toLowerCase();
-                const matchesSearch = allValues.includes(q);
+                // 1. Logic Status Filter (Termasuk logic khusus Outstanding)
                 let matchesStatus = true; 
                 if (filterVal !== "") {
                     if (filterVal === 'Belum Masuk') matchesStatus = (item.status === 'Belum Masuk' || item.status === 'Planning');
+                    else if (filterVal === 'OUTSTANDING') matchesStatus = (item.originalDate && item.originalDate !== item.date);
                     else matchesStatus = (item.status === filterVal);
                 }
-                return matchesSearch && matchesStatus;
+
+                // 2. Logic Search Category
+                let matchesSearch = false;
+                
+                if (searchCategory === 'all') {
+                    // Global Search (Cari di semua value)
+                    const allValues = Object.values(item).join(' ').toLowerCase();
+                    matchesSearch = allValues.includes(q);
+                } else if (searchCategory === 'vendor') {
+                    matchesSearch = (item.vendor || "").toLowerCase().includes(q) || (item.truck || "").toLowerCase().includes(q);
+                } else if (searchCategory === 'armada') {
+                    matchesSearch = (item.truck || "").toLowerCase().includes(q);
+                } else if (searchCategory === 'area') {
+                    matchesSearch = (item.area || "").toLowerCase().includes(q);
+                } else if (searchCategory === 'city') {
+                    matchesSearch = (item.city || "").toLowerCase().includes(q);
+                } else if (searchCategory === 'customer') {
+                    matchesSearch = (item.customer || "").toLowerCase().includes(q);
+                } else if (searchCategory === 'catatan') {
+                    matchesSearch = (item.catatan || "").toLowerCase().includes(q);
+                }
+
+                return matchesStatus && matchesSearch;
             });
 
             filteredForTable.forEach(item => {
@@ -1921,7 +1959,7 @@
             const tableBody = document.getElementById('monTableBody');
 
             if (filteredForTable.length === 0) {
-                tableBody.innerHTML = `<tr><td colspan="16" style="padding: 40px; text-align: center; color: #94a3b8;"><i class="fa-solid fa-clipboard-list" style="font-size:3rem; margin-bottom:10px;"></i><br>BELUM ADA DATA</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="16" style="padding: 40px; text-align: center; color: #94a3b8;"><i class="fa-solid fa-clipboard-list" style="font-size:3rem; margin-bottom:10px;"></i><br>DATA TIDAK DITEMUKAN</td></tr>`;
                 return;
             }
 
