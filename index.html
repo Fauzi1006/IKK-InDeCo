@@ -2640,6 +2640,18 @@
                 });
             }, 500); 
         }
+        // Fungsi untuk mengisi tanggal hari ini ke semua input date di menu Planning
+        function setTodayDate() {
+            const today = new Date().toISOString().split('T')[0];
+            const bulkDate = document.getElementById('p-bulk-date');
+            const manualDate = document.getElementById('m-date');
+            
+            if(bulkDate) bulkDate.value = today;
+            if(manualDate) manualDate.value = today;
+        }
+
+        // Jalankan saat halaman pertama kali dimuat
+        setTodayDate();
     </script>
 </body>
 </html>
