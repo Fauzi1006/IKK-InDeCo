@@ -694,6 +694,60 @@
 
 .box-purple { border-left: 3px solid #9333ea; }
 .box-purple .mini-icon { background: #faf5ff; color: #9333ea; }
+/* --- PAGINATION STYLE --- */
+.pagination-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+    padding: 15px;
+    background: white;
+    border-top: 2px solid #e2e8f0;
+    
+    /* MODIFIKASI POSISI AGAR DI ATAS COPYRIGHT */
+    position: sticky;
+    bottom: 40px; /* NAIKKAN JARAKNYA (Sesuaikan jika masih tertutup, misal 50px atau 60px) */
+    z-index: 999;  /* NAIKKAN NILAI INI AGAR DI DEPAN */
+    box-shadow: 0 -10px 15px -3px rgba(0, 0, 0, 0.1); /* Bayangan lebih tegas biar kontras */
+    border-radius: 8px 8px 0 0; /* Opsional: sedikit melengkung di atas agar cantik */
+}
+
+.page-btn {
+    padding: 8px 14px;
+    border: 1px solid #cbd5e1;
+    background: white;
+    color: #334155;
+    cursor: pointer;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.page-btn:hover:not(:disabled) {
+    background-color: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+.page-btn.active {
+    background-color: var(--color-primary); /* Mengambil warna biru tema */
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.page-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background-color: #f8fafc;
+}
+
+.page-dots {
+    color: #94a3b8;
+    padding: 0 5px;
+    font-weight: bold;
+}
     </style>
 </head>
 <body class="sidebar-hidden">
@@ -1329,6 +1383,10 @@
                             <tbody id="histTableBody"></tbody>
                         </table>
                     </div>
+                    <div id="history-pagination" class="pagination-container">
+    </div>
+
+<div id="pagination-info-box" style="display:none;"></div>
 
                 </div>
             </div>
@@ -1429,6 +1487,8 @@
 
         // --- 2. GLOBAL VARIABLES ---
         let allShipments = []; 
+        let currentHistoryPage = 1;
+const historyItemsPerPage = 100;
         let snapshotUnsubscribe = null; 
         let myChartArea = null;
         let myChartArmada = null;
@@ -2231,60 +2291,138 @@
         }
 
         // --- 10. HISTORY FUNCTIONS ---
-        function renderHistory() {
-            const q = document.getElementById('histSearch').value.toLowerCase();
-            const start = document.getElementById('hist-start').value;
-            const end = document.getElementById('hist-end').value;
-            
-            const filtered = allShipments.filter(d => {
-                const isFinished = (d.status === 'Gate In' || d.status === 'Cancelled');
-                if(!isFinished) return false;
+        function renderHistory(resetPage = false) {
+    // Jika ada pencarian baru atau filter tanggal, balik ke halaman 1
+    if (resetPage) currentHistoryPage = 1;
 
-                const allValues = Object.values(d).join(' ').toLowerCase();
-                const matchesSearch = allValues.includes(q);
-                let inRange = true;
-                if (start && end) inRange = d.date >= start && d.date <= end;
-                return matchesSearch && inRange;
-            });
-            updateVendorHistoryStats(filtered);
+    const q = document.getElementById('histSearch').value.toLowerCase();
+    const start = document.getElementById('hist-start').value;
+    const end = document.getElementById('hist-end').value;
+    
+    // 1. Proses Filter Data
+    const filtered = allShipments.filter(d => {
+        const isFinished = (d.status === 'Gate In' || d.status === 'Cancelled');
+        if(!isFinished) return false;
 
-// ----------------------------------
-            
-            const tbody = document.getElementById('histTableBody');
-            
-            const checkAll = document.getElementById('checkAllHistory');
-            if(checkAll) checkAll.checked = false;
+        const allValues = Object.values(d).join(' ').toLowerCase();
+        const matchesSearch = allValues.includes(q);
+        let inRange = true;
+        if (start && end) inRange = d.date >= start && d.date <= end;
+        return matchesSearch && inRange;
+    });
 
-            if(filtered.length === 0) { 
-                tbody.innerHTML = '<tr><td colspan="14" style="padding:20px; color:#64748b; font-style:italic; text-align:center;">Tidak ada data history pada periode ini.</td></tr>'; 
-                return; 
-            }
-            
-            tbody.innerHTML = filtered.map((item, index) => {
-                let outstandingDesc = '-';
-                if (item.originalDate && item.originalDate !== item.date) {
-                    outstandingDesc = `<span class="text-outstanding">Outstanding dari<br>${item.originalDate}</span>`;
-                }
-                
-                return `
-                <tr>
-                    <td><input type="checkbox" class="hist-check" value="${item.id}"></td>
-                    <td>${index + 1}</td>
-                    <td style="font-weight:bold; color:#2563eb;">${item.dns}</td>
-                    <td>${item.sn || '-'}</td>
-                    <td>${item.date}</td>
-                    <td>${item.vendor}</td>
-                    <td>${item.truck || '-'}</td>
-                    <td>${item.area}</td>
-                    <td>${item.city}</td>
-                    <td>${item.customer}</td>
-                    <td class="col-number">${formatNumber(item.qty)}</td>
-                    <td style="color:#d97706; font-weight:600;">${item.catatan || '-'}</td>
-                    <td>${outstandingDesc}</td>
-                    <td style="color:#0f172a; font-weight:600;">${item.gateInTime || '-'}</td>
-                </tr>`;
-            }).join('');
+    updateVendorHistoryStats(filtered);
+
+    // 2. Logika Pagination (Hitung Halaman)
+    const totalItems = filtered.length;
+    const totalPages = Math.ceil(totalItems / historyItemsPerPage);
+
+    if (currentHistoryPage > totalPages) currentHistoryPage = totalPages || 1;
+    if (currentHistoryPage < 1) currentHistoryPage = 1;
+
+    // Tentukan data mana yang ditampilkan (Contoh: data ke 1 sampai 100)
+    const startIndex = (currentHistoryPage - 1) * historyItemsPerPage;
+    const endIndex = Math.min(startIndex + historyItemsPerPage, totalItems);
+    const paginatedData = filtered.slice(startIndex, endIndex);
+
+    const tbody = document.getElementById('histTableBody');
+    const checkAll = document.getElementById('checkAllHistory');
+    if(checkAll) checkAll.checked = false;
+
+    // Tampilan jika data kosong
+    if(totalItems === 0) { 
+        tbody.innerHTML = '<tr><td colspan="14" style="padding:20px; color:#64748b; font-style:italic; text-align:center;">Tidak ada data history pada periode ini.</td></tr>'; 
+        document.getElementById('history-pagination').innerHTML = '';
+        updateInfoLabel(0, 0, 0);
+        return; 
+    }
+    
+    // 3. Render Baris Tabel
+    tbody.innerHTML = paginatedData.map((item, index) => {
+        let outstandingDesc = '-';
+        if (item.originalDate && item.originalDate !== item.date) {
+            outstandingDesc = `<span class="text-outstanding">Outstanding dari<br>${item.originalDate}</span>`;
         }
+        
+        return `
+        <tr>
+            <td><input type="checkbox" class="hist-check" value="${item.id}"></td>
+            <td>${startIndex + index + 1}</td> 
+            <td style="font-weight:bold; color:#2563eb;">${item.dns}</td>
+            <td>${item.sn || '-'}</td>
+            <td>${item.date}</td>
+            <td>${item.vendor}</td>
+            <td>${item.truck || '-'}</td>
+            <td>${item.area}</td>
+            <td>${item.city}</td>
+            <td>${item.customer}</td>
+            <td class="col-number">${formatNumber(item.qty)}</td>
+            <td style="color:#d97706; font-weight:600;">${item.catatan || '-'}</td>
+            <td>${outstandingDesc}</td>
+            <td style="color:#0f172a; font-weight:600;">${item.gateInTime || '-'}</td>
+        </tr>`;
+    }).join('');
+
+    // 4. Update Tombol Navigasi & Info Halaman
+    renderPaginationControls(totalPages);
+    updateInfoLabel(startIndex + 1, endIndex, totalItems);
+}
+
+// --- TAMBAHKAN 3 FUNGSI PENDUKUNG INI DI BAWAH FUNGSI DI ATAS ---
+
+function renderPaginationControls(totalPages) {
+    const container = document.getElementById('history-pagination');
+    if (totalPages <= 1) { 
+        container.style.display = 'none'; // Sembunyikan jika data sedikit
+        return; 
+    }
+    
+    container.style.display = 'flex'; // Munculkan kembali jika data banyak
+
+    // Ambil start, end, dan total untuk info teks
+    const start = (currentHistoryPage - 1) * historyItemsPerPage + 1;
+    const total = allShipments.filter(d => d.status === 'Gate In' || d.status === 'Cancelled').length; // Sesuaikan filter Anda
+    const end = Math.min(start + historyItemsPerPage - 1, total);
+
+    // Bagian 1: Teks Info (Kita taruh di paling atas dalam container)
+    let html = `<div style="width:100%; text-align:center; font-size:0.75rem; color:#64748b; margin-bottom:10px;">
+                    Menampilkan <b>${start} - ${end}</b> dari <b>${formatNumber(total)}</b> data
+                </div>`;
+
+    // Bagian 2: Tombol Prev
+    html += `<button class="page-btn" onclick="changeHistoryPage(${currentHistoryPage - 1})" ${currentHistoryPage === 1 ? 'disabled' : ''}>Prev</button>`;
+
+    // Bagian 3: Angka-angka
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentHistoryPage - 2 && i <= currentHistoryPage + 2)) {
+            html += `<button class="page-btn ${i === currentHistoryPage ? 'active' : ''}" onclick="changeHistoryPage(${i})">${i}</button>`;
+        } else if (i === currentHistoryPage - 3 || i === currentHistoryPage + 3) {
+            html += `<span class="page-dots">...</span>`;
+        }
+    }
+
+    // Bagian 4: Tombol Next
+    html += `<button class="page-btn" onclick="changeHistoryPage(${currentHistoryPage + 1})" ${currentHistoryPage === totalPages ? 'disabled' : ''}>Next</button>`;
+    
+    container.innerHTML = html;
+}
+
+function changeHistoryPage(newPage) {
+    currentHistoryPage = newPage;
+    renderHistory(false);
+    
+    // Tambahkan ini supaya setelah klik, layar otomatis naik ke posisi atas tabel
+    const historySection = document.querySelector('.history-card-container');
+    if (historySection) {
+        historySection.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+function updateInfoLabel(start, end, total) {
+    document.getElementById('disp-start').innerText = start;
+    document.getElementById('disp-end').innerText = end;
+    document.getElementById('disp-total').innerText = formatNumber(total);
+}
         function updateVendorHistoryStats(data) {
     const container = document.getElementById('vendor-stats-container');
     if (!container) return;
