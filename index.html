@@ -1017,11 +1017,11 @@
                             <input type="date" id="p-bulk-date">
                         </div>
                         <div>
-                            <label>Vendor / Transporter</label>
+                            <label>VENDOR (Boleh dikosongkan, akan tampil ‘BELUM BOOKING’ di monitoring) *</label>
                             <input type="text" id="p-bulk-vendor" list="list-history-vendor" placeholder="Pilih / Ketik...">
                         </div>
                         <div>
-                            <label>Area Tujuan</label>
+                            <label>AREA (opsional, terisi otomatis di monitoring)</label>
                             <input type="text" id="p-bulk-area" list="list-area-options" placeholder="Pilih Area...">
                         </div>
                         <div>
@@ -1030,7 +1030,7 @@
                         </div>
                     </div>
                     
-                    <label>Data Excel (Copy dari Excel kolom DN s/d Ket, lalu Paste di sini)</label>
+                    <label>Data SAP (Copy dari SAP ECC LAYOUT 'FAUZI' kolom DN s/d Ket, lalu Paste di sini)</label>
                     <textarea id="p-bulk-data" style="height: 200px; margin-bottom: 15px;" placeholder="Paste data SAP di sini..."></textarea>
                     
                     <div style="text-align: right;">
@@ -1276,7 +1276,7 @@
         <div class="stat-mini box-green" title="Actual Gate In (Non Ambil Sendiri)">
             <div class="mini-icon"><i class="fa-solid fa-check-double"></i></div>
             <div class="mini-content">
-                <span class="mini-label">TOTAL ACTUAL</span>
+                <span class="mini-label">TOTAL REALZ</span>
                 <span class="mini-value" id="box-act-non">0</span>
             </div>
         </div>
@@ -1292,7 +1292,7 @@
         <div class="stat-mini box-purple" title="Actual Gate In (Ambil Sendiri)">
             <div class="mini-icon"><i class="fa-solid fa-clipboard-check"></i></div>
             <div class="mini-content">
-                <span class="mini-label">AMBIL SENDIRI (ACT)</span>
+                <span class="mini-label">AMBIL SENDIRI (REALZ)</span>
                 <span class="mini-value" id="box-act-self">0</span>
             </div>
         </div>
