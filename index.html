@@ -1566,6 +1566,20 @@
             
             if(label) document.getElementById('sub-page-title').innerText = label;
             localStorage.setItem(KEY_LAST_PAGE, pageId);
+
+            // --- TAMBAHAN OTOMATIS TANGGAL HARI INI ---
+            if(pageId === 'planning') {
+                const today = new Date().toISOString().split('T')[0];
+                
+                // Isi tanggal otomatis untuk bagian Copas Excel
+                const bulkDateInput = document.getElementById('p-bulk-date');
+                if(bulkDateInput) bulkDateInput.value = today;
+
+                // Isi tanggal otomatis untuk bagian Manual (jika ada)
+                const manualDateInput = document.getElementById('m-date');
+                if(manualDateInput) manualDateInput.value = today;
+            }
+            // ------------------------------------------
             
             if(pageId === 'dashboard') renderDashboard();
             if(pageId === 'monitoring') updateMonitoring();
@@ -1989,7 +2003,11 @@
                 document.getElementById('p-bulk-data').value = "";      // Kosongkan area Paste Excel
                 document.getElementById('p-bulk-vendor').value = "";    // Kosongkan Vendor
                 document.getElementById('p-bulk-area').value = "";      // Kosongkan Area
-                document.getElementById('p-bulk-date').value = "";      // Kosongkan Tanggal
+                
+                // --- PERBAIKAN: Tanggal otomatis kembali ke hari ini ---
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('p-bulk-date').value = today;
+                
                 document.getElementById('p-bulk-catatan').value = "";   // Kosongkan Catatan
                 
                 // Pindah ke halaman monitoring untuk melihat hasilnya
