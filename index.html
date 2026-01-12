@@ -17,6 +17,62 @@
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
 
     <style>
+        .btn-edit-history {
+    background: #f59e0b; /* Warna Oranye */
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.btn-edit-history:hover {
+    background: #d97706;
+}
+        /* Style untuk Modal Peringatan DN Double */
+.dn-modal-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.7);
+    display: flex; justify-content: center; align-items: center;
+    z-index: 9999;
+}
+.dn-modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    max-width: 450px;
+    text-align: center;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+.dn-icon-warn {
+    font-size: 60px;
+    color: #eab308; /* Warna Kuning Peringatan */
+    margin-bottom: 20px;
+}
+.dn-modal-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #1e293b;
+    margin-bottom: 10px;
+}
+.dn-list {
+    background: #fef2f2;
+    color: #b91c1c;
+    padding: 10px;
+    border-radius: 8px;
+    margin: 15px 0;
+    font-family: monospace;
+    font-size: 14px;
+    border: 1px solid #fee2e2;
+}
+.dn-btn-group {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-top: 20px;
+}
+.btn-ya { background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+.btn-tidak { background: #64748b; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; }
         /* --- 1. THEME VARIABLES --- */
         :root {
             --bg-body: #f1f5f9;
@@ -942,7 +998,7 @@
             <div id="page-planning" class="page">
                 <div class="card">
                     <div style="border-bottom: 1px solid #e2e8f0; margin-bottom: 20px; padding-bottom: 10px;">
-                        <h3 style="margin:0; color:var(--text-main);"><i class="fa-solid fa-file-excel"></i> Buat Planning (Copy-Paste Excel)</h3>
+                        <h3 style="margin:0; color:var(--text-main);"><i class="fa-solid fa-file-excel"></i> Buat Planning (Copy-Paste SAP)</h3>
                     </div>
 
                     <datalist id="list-history-vendor"></datalist>
@@ -1977,108 +2033,156 @@ const historyItemsPerPage = 100;
 
         // --- 8. PLANNING FUNCTIONS ---
         async function processBulkPlanning() {
-            const rawData = document.getElementById('p-bulk-data').value.trim();
-            let vendorName = document.getElementById('p-bulk-vendor').value.trim() || "BELUM BOOKING";
-            let selectedArea = document.getElementById('p-bulk-area').value.trim() || "-";
-            const manualDate = document.getElementById('p-bulk-date').value;
-            const manualNote = document.getElementById('p-bulk-catatan').value; 
+    const rawData = document.getElementById('p-bulk-data').value.trim();
+    let vendorName = document.getElementById('p-bulk-vendor').value.trim() || "BELUM BOOKING";
+    let fallbackArea = document.getElementById('p-bulk-area').value.trim() || "-";
+    const manualDate = document.getElementById('p-bulk-date').value;
+    const manualNote = document.getElementById('p-bulk-catatan').value;
 
-            if(!manualDate) { alert("MOHON ISI TANGGAL PICKUP!"); return; }
-            if (!rawData) { alert("Mohon Paste data dari Excel!"); return; }
-            if (!confirm("APAKAH ANDA YAKIN AKAN MEMBUAT PLANNING DELIVERY INI?")) { return; }
+    if (!manualDate) { alert("MOHON ISI TANGGAL PICKUP!"); return; }
+    if (!rawData) { alert("Mohon Paste data dari Excel!"); return; }
 
-            const rows = rawData.split('\n');
-            const groups = {};
+    const rows = rawData.split('\n');
+    const groups = {};
+    const allDNs = [];
 
-            rows.forEach(row => {
-                const cols = row.split('\t');
-                if (cols.length < 5) return;
-                
-                const dnNumber = cols[1] ? cols[1].trim() : "";
-                const snNumber = cols[3] ? cols[3].trim() : "";
-                const customer = cols[4] ? cols[4].trim() : "";
-                let rawCity = (cols[5] || "").toUpperCase().replace(/KABUPATEN|KAB\.|KOTA|ADMINISTRASI/gi, "").trim();
-                const city = rawCity.split(" ")[0]; 
-                const qty = parseFloat((cols[6] || "0").replace(/,/g, "")) || 0;
+    // --- PROSES DATA (Logic Area & Armada Sama Seperti Sebelumnya) ---
+    rows.forEach(row => {
+        const cols = row.split('\t');
+        if (cols.length < 2) return;
 
-                const rawArmada = cols[8] ? cols[8].toUpperCase() : "";
-                let armadaType = "Lainnya";
-                if(rawArmada.includes("TRONTON")) armadaType = "TRONTON";
-                else if(rawArmada.includes("TRAILER")) armadaType = "TRAILER";
-                else if(rawArmada.includes("CDD") || rawArmada.includes("COLT")) armadaType = "CDD";
-                else if(rawArmada.includes("FUSO")) armadaType = "FUSO";
-                else if(rawArmada.includes("WING") || rawArmada.includes("BOX")) armadaType = "WINGBOX";
-                else if(rawArmada.includes("CONT") || rawArmada.includes("20") || rawArmada.includes("40")) armadaType = "CONTAINER";
-                else if(rawArmada.length > 2) armadaType = rawArmada; 
+        const dnNumber = cols[1] ? cols[1].trim() : "";
+        if (dnNumber) allDNs.push(dnNumber);
 
-                const note1 = cols[7] ? cols[7].trim() : "";
-                let fullNoteText = (note1 + " " + manualNote).toUpperCase();
-                
-                let isSelfPickup = fullNoteText.includes("AMBIL SENDIRI");
-                let isNextDay = fullNoteText.includes("NEXT DAY");
+        const snNumber = cols[3] ? cols[3].trim() : "";
+        const customer = cols[4] ? cols[4].trim() : "";
+        let textToScan = row.toUpperCase();
+        let rawCity = (cols[5] || "").toUpperCase();
 
-                let finalNote = manualNote;
-                let finalArea = selectedArea;
-
-                if (isSelfPickup) { 
-                    finalNote = "AMBIL SENDIRI"; 
-                    finalArea = "AMBIL SENDIRI"; 
-                } else if (isNextDay) {
-                    finalNote = "NEXT DAY";
-                }
-
-                const gbMatch = note1.match(/GB\s*(\d+)/i);
-                let groupKey = gbMatch ? `GB${gbMatch[1]}_${customer.replace(/\s+/g, '').toUpperCase()}_${snNumber}` : `S_${Date.now()}_${Math.random()}`;
-
-                if (!groups[groupKey]) {
-                    groups[groupKey] = {
-                        dns: dnNumber, sn: snNumber, date: manualDate,
-                        vendor: vendorName, truck: armadaType, area: finalArea, city: city, customer: customer,
-                        qty: qty, catatan: finalNote, status: "Belum Masuk", gateInTime: null,
-                        createdAt: new Date().toISOString()
-                    };
-                } else {
-                    if (!groups[groupKey].dns.includes(dnNumber)) groups[groupKey].dns += `, ${dnNumber}`;
-                    groups[groupKey].qty += qty;
-                }
-            });
-
-            const batch = db.batch();
-            let count = 0;
-            const items = Object.values(groups);
-            
-            if(items.length > 450) { alert("Data terlalu banyak untuk satu batch. Mohon input bertahap (<450 baris)."); return; }
-
-            items.forEach(item => {
-                const docRef = db.collection("monitoring").doc();
-                batch.set(docRef, item);
-                count++;
-            });
-
-            try {
-                await batch.commit();
-                alert(`Berhasil menyimpan ${count} data planning!`);
-
-                // --- PROSES PEMBERSIHAN KOLOM INPUT (TANPA REFRESH) ---
-                document.getElementById('p-bulk-data').value = "";      // Kosongkan area Paste Excel
-                document.getElementById('p-bulk-vendor').value = "";    // Kosongkan Vendor
-                document.getElementById('p-bulk-area').value = "";      // Kosongkan Area
-                
-                // --- PERBAIKAN: Tanggal otomatis kembali ke hari ini ---
-                const today = new Date().toISOString().split('T')[0];
-                document.getElementById('p-bulk-date').value = today;
-                
-                document.getElementById('p-bulk-catatan').value = "";   // Kosongkan Catatan
-                
-                // Pindah ke halaman monitoring untuk melihat hasilnya
-                showPage('monitoring', 'Live Monitoring');
-                
-            } catch (err) {
-                console.error("Batch Failed:", err);
-                alert("Gagal menyimpan data.");
-            }
-            document.getElementById('p-bulk-data').focus();
+        // LOGIKA AREA
+        let finalArea = fallbackArea;
+        if (textToScan.includes("AMBIL SENDIRI") || manualNote.toUpperCase().includes("AMBIL SENDIRI")) {
+            finalArea = "AMBIL SENDIRI";
+        } else if (/(SIDOARJO|SURABAYA|GRESIK|MALANG|PASURUAN|MOJOKERTO|JOMBANG|PROBOLINGGO|LUMAJANG|JEMBER|BANYUWANGI|TUBAN|LAMONGAN|BOJONEGORO|MADIUN|KEDIRI|BLITAR)/.test(textToScan)) {
+            finalArea = "JAWA TIMUR";
+        } else if (/(SEMARANG|SOLO|SURAKARTA|JOGJA|YOGYAKARTA|KLATEN|BOYOLALI|SRAGEN|SALATIGA|MAGELANG|CILACAP|PURWOKERTO|TEGAL|BREBES|KUDUS|PATI)/.test(textToScan)) {
+            finalArea = "JAWA TENGAH";
+        } else if (/(JAKARTA|BEKASI|BOGOR|DEPOK|TANGERANG|CIKARANG|KARAWANG|BANDUNG|SUBANG|PURWAKARTA|SUKABUMI|CIANJUR|CIREBON|INDRAMAYU)/.test(textToScan)) {
+            finalArea = "JABODETABEK";
+        } else {
+            finalArea = "LUAR PULAU";
         }
+
+        // LOGIKA ARMADA
+        let armadaType = "Lainnya";
+        if (textToScan.includes("TRONTON") || textToScan.includes("TRT")) armadaType = "TRONTON";
+        else if (textToScan.includes("TRAILER") || textToScan.includes("TRL")) armadaType = "TRAILER";
+        else if (textToScan.includes("CONTAINER") || textToScan.includes("CONT") || textToScan.includes("20 FT") || textToScan.includes("40 FT")) armadaType = "CONTAINER";
+        else if (textToScan.includes("CDD") || textToScan.includes("COLT")) armadaType = "CDD";
+        else if (textToScan.includes("WINGBOX") || textToScan.includes("WING")) armadaType = "WINGBOX";
+
+        const cityDisplay = rawCity.replace(/KABUPATEN|KAB\.|KOTA|ADMINISTRASI/gi, "").trim().split(" ")[0];
+        const qty = parseFloat((cols[6] || "0").replace(/,/g, "")) || 0;
+        const excelNote = (cols[7] || "").toUpperCase();
+
+        const gbMatch = excelNote.match(/GB\s*(\d+)/i);
+        let groupKey = gbMatch ? `GB${gbMatch[1]}_${customer.replace(/\s+/g, '').toUpperCase()}_${snNumber}` : `S_${Date.now()}_${Math.random()}`;
+
+        if (!groups[groupKey]) {
+            groups[groupKey] = {
+                dns: dnNumber, sn: snNumber, date: manualDate,
+                vendor: vendorName, truck: armadaType, area: finalArea,
+                city: cityDisplay, customer: customer, qty: qty, 
+                catatan: (finalArea === "AMBIL SENDIRI" ? "AMBIL SENDIRI" : manualNote),
+                status: "Belum Masuk", createdAt: new Date().toISOString()
+            };
+        } else {
+            if (!groups[groupKey].dns.includes(dnNumber)) groups[groupKey].dns += `, ${dnNumber}`;
+            groups[groupKey].qty += qty;
+        }
+    });
+
+    // --- CEK DUPLIKASI DN ---
+    try {
+        let duplicateList = [];
+        const snapshot = await db.collection("monitoring").get();
+        snapshot.forEach(doc => {
+            const data = doc.data();
+            allDNs.forEach(dn => {
+                if (data.dns && data.dns.includes(dn)) {
+                    if(!duplicateList.includes(dn)) duplicateList.push(dn);
+                }
+            });
+        });
+
+        if (duplicateList.length > 0) {
+            // JIKA ADA DUPLIKAT, TAMPILKAN MODAL CUSTOM
+            const userSetuju = await showDuplicateDNModal(duplicateList);
+            if (!userSetuju) return; // Berhenti jika user klik TIDAK
+        } else {
+            if (!confirm("APAKAH ANDA YAKIN AKAN MEMBUAT PLANNING DELIVERY INI?")) return;
+        }
+
+        // --- PROSES SIMPAN BATCH ---
+        const batch = db.batch();
+        const items = Object.values(groups);
+        items.forEach(item => {
+            const docRef = db.collection("monitoring").doc();
+            batch.set(docRef, item);
+        });
+
+        await batch.commit();
+        alert(`BERHASIL! ${items.length} Data tersimpan.`);
+
+        // --- BAGIAN YANG DIUBAH/DITAMBAH ---
+        document.getElementById('p-bulk-data').value = "";   // Kosongkan Paste Excel
+        document.getElementById('p-bulk-vendor').value = ""; // Kosongkan Vendor (DITAMBAHKAN)
+        document.getElementById('p-bulk-area').value = "";   // Kosongkan Area (DITAMBAHKAN)
+        document.getElementById('p-bulk-catatan').value = ""; // Kosongkan Catatan (DITAMBAHKAN)
+        
+        // Reset tanggal ke hari ini
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('p-bulk-date').value = today;
+        // ------------------------------------
+
+        showPage('monitoring', 'Live Monitoring');
+
+    } catch (err) {
+        console.error(err);
+        alert("Gagal memproses data.");
+    }
+}
+
+// --- FUNGSI UNTUK MEMUNCULKAN MODAL CUSTOM (PROMISE) ---
+function showDuplicateDNModal(dns) {
+    return new Promise((resolve) => {
+        const modalHtml = `
+            <div id="custom-dn-modal" class="dn-modal-overlay">
+                <div class="dn-modal-content">
+                    <div class="dn-icon-warn"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                    <div class="dn-modal-title">DETEKSI DN DUPLIKAT!</div>
+                    <p style="color: #64748b; font-size: 14px;">Nomor DN berikut sudah pernah direncanakan sebelumnya:</p>
+                    <div class="dn-list">${dns.join(', ')}</div>
+                    <p style="font-weight: 600; font-size: 15px;">Tetap lanjutkan proses planning?</p>
+                    <div class="dn-btn-group">
+                        <button class="btn-ya" id="dn-ya">YA, PROSES</button>
+                        <button class="btn-tidak" id="dn-tidak">TIDAK, BATALKAN</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+        document.getElementById('dn-ya').onclick = () => {
+            document.getElementById('custom-dn-modal').remove();
+            resolve(true);
+        };
+        document.getElementById('dn-tidak').onclick = () => {
+            document.getElementById('custom-dn-modal').remove();
+            resolve(false);
+        };
+    });
+}
 
         async function saveManualPlanning() {
             const date = document.getElementById('m-date').value;
