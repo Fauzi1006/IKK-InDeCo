@@ -804,6 +804,17 @@
     padding: 0 5px;
     font-weight: bold;
 }
+/* --- CSS KHUSUS DELAY LIST --- */
+.delay-container { display: flex; gap: 20px; width: 100%; flex-wrap: wrap; }
+.delay-box { flex: 1; min-width: 400px; background: white; border-radius: 8px; box-shadow: var(--shadow-sm); border-top: 5px solid #dc3545; overflow: hidden; display: flex; flex-direction: column; }
+.delay-header { padding: 15px; background: #fee2e2; color: #991b1b; font-weight: 800; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #fecaca; }
+.row-urgent { background-color: #fef2f2 !important; color: #7f1d1d !important; font-weight: 600; }
+.row-urgent td { border-color: #fecaca !important; }
+.tag-delay { background: #dc2626; color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; font-weight: bold; margin-right: 5px; }
+.empty-delay { padding: 30px; text-align: center; color: #94a3b8; font-style: italic; }
+/* Agar tabel responsif di dalam box */
+.delay-box .table-responsive { border: none; margin: 0; }
+.delay-box th { background-color: #b91c1c !important; color: white !important; border-color: #991b1b !important; }
     </style>
 </head>
 <body class="sidebar-hidden">
@@ -884,6 +895,11 @@
                     <i class="fa-solid fa-chart-line"></i>
                     <span>Dashboard</span>
                 </a>
+                <a onclick="showPage('delay', 'Delay List Monitoring')" class="nav-item" id="menu-delay" data-tooltip="Delay List">
+    <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i>
+    <span>Delay List</span>
+    <span style="margin-left:auto; background:#ef4444; color:white; font-size:0.6rem; padding:2px 6px; border-radius:4px;">URGENT</span>
+</a>
                 
                 <div class="menu-label">OPERATIONS</div>
                 <a onclick="showPage('planning', 'Delivery Planning')" class="nav-item" id="menu-planning" data-tooltip="Planning">
@@ -994,6 +1010,72 @@
                     </div>
                 </div>
             </div>
+            <div id="page-delay" class="page">
+    <div class="stats-container">
+        <div style="background: #fee2e2; border-left: 5px solid #dc2626; padding: 15px; border-radius: 6px; color: #7f1d1d; margin-bottom: 20px; width: 100%; box-sizing: border-box;">
+            <i class="fa-solid fa-triangle-exclamation"></i> 
+            <strong>Monitoring Delay:</strong> Durasi dihitung otomatis dari waktu data dibuat (Created At). Gunakan tombol edit untuk memperbarui catatan secara manual.
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; align-items: start;">
+        
+        <div class="delay-box" style="width: 100%; margin: 0; min-width: 0;">
+            <div class="delay-header">
+                <span><i class="fa-solid fa-clock"></i> DELAY GATE IN (> 6 Jam)</span>
+                <span id="count-delay-gatein" style="background:white; padding:2px 8px; border-radius:10px; font-size:0.75rem;">0 Item</span>
+            </div>
+            <div class="table-responsive" style="max-height: 70vh; overflow: auto;">
+                <table class="main-data-table" style="width: 100%; white-space: nowrap;">
+                    <thead>
+    <tr>
+        <th>Created At</th>
+        <th>Total Durasi</th>
+        <th>No DN</th>
+        <th>Vendor</th>
+        <th>Armada</th>
+        <th>Kota</th>
+        <th>Area</th>
+        <th>Customer</th>
+        <th>Qty</th>
+        <th>Catatan</th>
+        <th>Aksi</th>
+    </tr>
+</thead>
+                    <tbody id="tbody-delay-gatein"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="delay-box" style="width: 100%; margin: 0; min-width: 0;">
+            <div class="delay-header">
+                <span><i class="fa-solid fa-user-clock"></i> DELAY BOOKING (> 2 Jam)</span>
+                <span id="count-delay-booking" style="background:white; padding:2px 8px; border-radius:10px; font-size:0.75rem;">0 Item</span>
+            </div>
+            <div class="table-responsive" style="max-height: 70vh; overflow: auto;">
+                <table class="main-data-table" style="width: 100%; white-space: nowrap;">
+                    <thead>
+    <tr>
+        <th>Created At</th>
+        <th>Total Durasi</th>
+        <th>No DN</th>
+        <th>Vendor</th>
+        <th>Armada</th>
+        <th>Kota</th>
+        <th>Area</th>
+        <th>Customer</th>
+        <th>Qty</th>
+        <th>Catatan</th>
+        <th>Aksi</th>
+    </tr>
+</thead>
+                    <tbody id="tbody-delay-booking"></tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
 
             <div id="page-planning" class="page">
                 <div class="card">
@@ -1613,23 +1695,27 @@ const historyItemsPerPage = 100;
 
         // --- 4. FIRESTORE LISTENER ---
         function initRealtimeListener() {
-            snapshotUnsubscribe = db.collection('monitoring')
-                .orderBy('createdAt', 'desc')
-                .onSnapshot((snapshot) => {
-                    const temp = [];
-                    snapshot.forEach((doc) => {
-                        temp.push({ id: doc.id, ...doc.data() });
-                    });
-                    
-                    allShipments = temp;
-                    console.log(`Updated: ${allShipments.length} records.`);
-                    
-                    updateMasterDataFromEntries();
-                    refreshAllViews();
-                }, (error) => {
-                    console.error("Firestore Error:", error);
-                });
-        }
+    snapshotUnsubscribe = db.collection('monitoring')
+        .orderBy('createdAt', 'desc')
+        .onSnapshot((snapshot) => {
+            const temp = [];
+            snapshot.forEach((doc) => {
+                temp.push({ id: doc.id, ...doc.data() });
+            });
+            
+            allShipments = temp;
+            console.log(`Updated: ${allShipments.length} records.`);
+            
+            updateMasterDataFromEntries();
+            refreshAllViews();
+            
+            // --- TAMBAHKAN BARIS INI ---
+            renderDelayList(); 
+            // ---------------------------
+        }, (error) => {
+            console.error("Firestore Error:", error);
+        });
+}
 
         function updateMasterDataFromEntries() {
             const vendors = [...new Set(allShipments.map(s => s.vendor))].filter(Boolean).sort();
@@ -1673,35 +1759,35 @@ const historyItemsPerPage = 100;
         }
 
         function showPage(pageId, label) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(m => m.classList.remove('active'));
-            document.getElementById('page-' + pageId).classList.add('active');
-            
-            const activeMenu = document.getElementById('menu-' + pageId);
-            if(activeMenu) activeMenu.classList.add('active');
-            
-            if(label) document.getElementById('sub-page-title').innerText = label;
-            localStorage.setItem(KEY_LAST_PAGE, pageId);
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(m => m.classList.remove('active'));
+    document.getElementById('page-' + pageId).classList.add('active');
+    
+    const activeMenu = document.getElementById('menu-' + pageId);
+    if(activeMenu) activeMenu.classList.add('active');
+    
+    if(label) document.getElementById('sub-page-title').innerText = label;
+    localStorage.setItem(KEY_LAST_PAGE, pageId);
 
-            // --- TAMBAHAN OTOMATIS TANGGAL HARI INI ---
-            if(pageId === 'planning') {
-                const today = new Date().toISOString().split('T')[0];
-                
-                // Isi tanggal otomatis untuk bagian Copas Excel
-                const bulkDateInput = document.getElementById('p-bulk-date');
-                if(bulkDateInput) bulkDateInput.value = today;
-
-                // Isi tanggal otomatis untuk bagian Manual (jika ada)
-                const manualDateInput = document.getElementById('m-date');
-                if(manualDateInput) manualDateInput.value = today;
-            }
-            // ------------------------------------------
-            
-            if(pageId === 'dashboard') renderDashboard();
-            if(pageId === 'monitoring') updateMonitoring();
-            if(pageId === 'analysis') updateAnalysis();
-            if(pageId === 'history') renderHistory();
-        }
+    // --- TAMBAHAN OTOMATIS TANGGAL HARI INI ---
+    if(pageId === 'planning') {
+        const today = new Date().toISOString().split('T')[0];
+        const bulkDateInput = document.getElementById('p-bulk-date');
+        if(bulkDateInput) bulkDateInput.value = today;
+        const manualDateInput = document.getElementById('m-date');
+        if(manualDateInput) manualDateInput.value = today;
+    }
+    // ------------------------------------------
+    
+    // --- LOGIKA PEMANGGILAN HALAMAN ---
+    if(pageId === 'dashboard') renderDashboard();
+    if(pageId === 'monitoring') updateMonitoring();
+    if(pageId === 'analysis') updateAnalysis();
+    if(pageId === 'history') renderHistory();
+    
+    // TAMBAHKAN BARIS INI:
+    if(pageId === 'delay') renderDelayList(); 
+}
 
         // --- 6. DASHBOARD LOGIC (History Based) ---
         function renderDashboard() {
@@ -2070,7 +2156,7 @@ const historyItemsPerPage = 100;
             finalArea = "JAWA TIMUR";
         } else if (/(SEMARANG|SOLO|SURAKARTA|JOGJA|YOGYAKARTA|KLATEN|BOYOLALI|SRAGEN|SALATIGA|MAGELANG|CILACAP|PURWOKERTO|TEGAL|BREBES|KUDUS|PATI|KENDAL)/.test(textToScan)) {
             finalArea = "JAWA TENGAH";
-        } else if (/(JAKARTA|BEKASI|BOGOR|DEPOK|TANGERANG|CIKARANG|KARAWANG|BANDUNG|SUBANG|PURWAKARTA|SUKABUMI|CIANJUR|CIREBON|INDRAMAYU|SERANG|DESA|BANTEN|CIKUPA)/.test(textToScan)) {
+        } else if (/(JAKARTA|BEKASI|BOGOR|DEPOK|TANGERANG|CIKARANG|KARAWANG|BANDUNG|SUBANG|PURWAKARTA|SUKABUMI|CIANJUR|CIREBON|INDRAMAYU|SERANG|CIKUPA|DESA|BANTEN|PANUNGGANGAN)/.test(textToScan)) {
             finalArea = "JABODETABEK";
         } else {
             finalArea = "LUAR PULAU";
@@ -2909,6 +2995,213 @@ function updateInfoLabel(start, end, total) {
 
         // Jalankan saat halaman pertama kali dimuat
         setTodayDate();
+        // --- LOGIKA DELAY LIST (REAL-TIME) ---
+
+// Fungsi untuk menghitung selisih waktu secara detail
+function calculateDuration(createdAt) {
+    if (!createdAt) return "-";
+    
+    const start = new Date(createdAt).getTime();
+    const now = new Date().getTime();
+    const diff = now - start;
+
+    if (diff < 0) return "0j 0m 0d";
+
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    return `${hours}j ${minutes}m ${seconds}d`;
+}
+
+// Fungsi utama untuk filter data dari Firestore dan tampilkan ke tabel Delay
+function refreshDelayList() {
+    // Ambil data mentah dari array monitoringData (yang sudah di-fetch dari Firestore di sistem Anda)
+    if (!monitoringData || monitoringData.length === 0) return;
+
+    const tbodyGateIn = document.getElementById('tbody-delay-gatein');
+    const tbodyBooking = document.getElementById('tbody-delay-booking');
+    
+    let countGateIn = 0;
+    let countBooking = 0;
+
+    let htmlGateIn = "";
+    let htmlBooking = "";
+
+    const now = new Date();
+
+    monitoringData.forEach((data) => {
+        // Hitung durasi dalam jam untuk filter logika
+        const createdAt = data.createdAt ? new Date(data.createdAt.seconds * 1000) : new Date();
+        const diffHours = (now - createdAt) / (1000 * 60 * 60);
+        
+        // Logika Tanggal: Outstanding vs Plan Date
+        const displayDate = data.outstandingDate || data.planDate || "-";
+
+        // 1. LOGIKA TABEL KIRI (Gate In > 6 Jam & Vendor bukan BELUM BOOKING)
+        if (data.status !== "GATE IN" && diffHours > 6 && data.vendor !== "BELUM BOOKING") {
+            countGateIn++;
+            htmlGateIn += `
+                <tr class="row-urgent">
+                    <td style="font-size: 10px;">${createdAt.toLocaleString()}</td>
+                    <td class="realtime-duration" data-start="${createdAt.toISOString()}">${calculateDuration(createdAt)}</td>
+                    <td>${displayDate}</td>
+                    <td>${data.dnNumber || '-'}</td>
+                    <td>${data.vendor || '-'}</td>
+                    <td>${data.armada || '-'}</td>
+                    <td>${data.area || '-'}</td>
+                    <td>${data.customer || '-'}</td>
+                    <td>${data.qty || '-'}</td>
+                    <td>${data.tonase || '-'}</td>
+                    <td>${data.notes || '-'}</td>
+                    <td>
+                        <button onclick="editData('${data.id}')" class="btn-action edit"><i class="fas fa-edit"></i></button>
+                    </td>
+                </tr>`;
+        }
+
+        // 2. LOGIKA TABEL KANAN (Vendor BELUM BOOKING > 2 Jam)
+        if (data.vendor === "BELUM BOOKING" && diffHours > 2) {
+            countBooking++;
+            htmlBooking += `
+                <tr class="row-urgent">
+                    <td style="font-size: 10px;">${createdAt.toLocaleString()}</td>
+                    <td class="realtime-duration" data-start="${createdAt.toISOString()}">${calculateDuration(createdAt)}</td>
+                    <td>${data.planDate || '-'}</td>
+                    <td>${data.dnNumber || '-'}</td>
+                    <td style="color:red; font-weight:bold;">${data.vendor}</td>
+                    <td>${data.armada || '-'}</td>
+                    <td>${data.area || '-'}</td>
+                    <td>${data.customer || '-'}</td>
+                    <td>${data.qty || '-'}</td>
+                    <td>${data.tonase || '-'}</td>
+                    <td>${data.notes || '-'}</td>
+                    <td>
+                        <button onclick="editData('${data.id}')" class="btn-action edit"><i class="fas fa-edit"></i></button>
+                    </td>
+                </tr>`;
+        }
+    });
+
+    // Masukkan ke HTML
+    tbodyGateIn.innerHTML = htmlGateIn || '<tr><td colspan="12" class="empty-delay">Tidak ada delay gate in</td></tr>';
+    tbodyBooking.innerHTML = htmlBooking || '<tr><td colspan="12" class="empty-delay">Semua vendor sudah booking</td></tr>';
+    
+    // Update angka counter
+    document.getElementById('count-delay-gatein').innerText = countGateIn + " Item";
+    document.getElementById('count-delay-booking').innerText = countBooking + " Item";
+}
+
+// Fungsi agar durasi di layar berdetak setiap detik tanpa query ulang ke database
+setInterval(() => {
+    const durationCells = document.querySelectorAll('.realtime-duration');
+    durationCells.forEach(cell => {
+        const startTime = cell.getAttribute('data-start');
+        cell.innerText = calculateDuration(startTime);
+    });
+}, 1000);
+
+// Panggil fungsi refresh saat data monitoring diupdate (integrasikan dengan fungsi fetch existing)
+// Anda perlu memanggil refreshDelayList() di dalam fungsi onSnapshot atau getDocs Firestore Anda.
+// --- FUNGSI PENGHITUNG WAKTU REAL-TIME ---
+function calculateDetailedDuration(startTime) {
+    if (!startTime) return "-";
+    const start = new Date(startTime).getTime();
+    const now = new Date().getTime();
+    const diff = now - start;
+
+    if (diff < 0) return "0j 0m 0d";
+
+    const hours = Math.floor(diff / (1000 * 60 * 60));
+    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((diff % (1000 * 60)) / 1000);
+
+    return `${hours}j ${minutes}m ${seconds}d`;
+}
+
+// 1. FUNGSI HITUNG DURASI
+function calculateDetailedDuration(startTime) {
+    if (!startTime) return "-";
+    let startDate = (startTime.seconds) ? new Date(startTime.seconds * 1000) : new Date(startTime);
+    const diff = new Date().getTime() - startDate.getTime();
+
+    if (diff < 0) return "0j 0m 0d";
+    const hours = Math.floor(diff / 3600000);
+    const minutes = Math.floor((diff % 3600000) / 60000);
+    const seconds = Math.floor((diff % 60000) / 1000);
+    return `${hours}j ${minutes}m ${seconds}d`;
+}
+
+// 2. FUNGSI RENDER TABEL (VERSI BERSIH & RAPI)
+function renderDelayList() {
+    const tbodyGateIn = document.getElementById('tbody-delay-gatein');
+    const tbodyBooking = document.getElementById('tbody-delay-booking');
+    if (!tbodyGateIn || !tbodyBooking || !allShipments) return;
+
+    tbodyGateIn.innerHTML = "";
+    tbodyBooking.innerHTML = "";
+
+    let countGateIn = 0, countBooking = 0;
+    const now = new Date();
+
+    allShipments.forEach((data) => {
+        let dateObj = data.createdAt?.seconds ? new Date(data.createdAt.seconds * 1000) : (data.createdAt ? new Date(data.createdAt) : null);
+        if (!dateObj) return;
+
+        const diffHours = (now - dateObj) / 3600000;
+        const statusUpper = (data.status || "").toUpperCase();
+        const vendorUpper = (data.vendor || "").toUpperCase();
+
+        const noDn = data.dns || "-";
+        const armada = data.truck || "-";
+        const kota = data.city || "-";
+        const catatan = data.catatan || "-";
+        const formattedQty = data.qty ? parseFloat(data.qty).toLocaleString('id-ID') : '0';
+
+        // BARIS TABEL: Hanya tombol Hapus (Warna Merah)
+        const rowHTML = `
+            <td style="font-size:10px; white-space:nowrap;">${dateObj.toLocaleString('id-ID')}</td>
+            <td class="realtime-tick" data-start="${dateObj.toISOString()}" style="font-weight:bold; color:red;">${calculateDetailedDuration(dateObj)}</td>
+            <td style="font-weight:bold; color:#2563eb;">${noDn}</td>
+            <td>${data.vendor || '-'}</td>
+            <td>${armada}</td>
+            <td>${kota}</td>
+            <td>${data.area || '-'}</td>
+            <td style="max-width:100px; overflow:hidden; text-overflow:ellipsis;" title="${data.customer}">${data.customer || '-'}</td>
+            <td style="text-align:right; font-weight:bold;">${formattedQty}</td>
+            <td><div style="font-size:10px; width:150px; white-space:normal;">${catatan}</div></td>
+            <td style="text-align:center;">
+                <button type="button" onclick="deleteItem('${data.id}')" style="background:#dc2626; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" title="Hapus Data">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+
+        // Filter Tabel Kiri: Gate In Delay
+        if (statusUpper !== "GATE IN" && diffHours > 6 && vendorUpper !== "BELUM BOOKING") {
+            countGateIn++;
+            tbodyGateIn.innerHTML += `<tr class="row-urgent">${rowHTML}</tr>`;
+        } 
+        
+        // Filter Tabel Kanan: Booking Delay (Perbaikan Logika Status)
+        // Data otomatis hilang jika status sudah "GATE IN"
+        else if (vendorUpper === "BELUM BOOKING" && statusUpper !== "GATE IN" && diffHours > 2) {
+            countBooking++;
+            tbodyBooking.innerHTML += `<tr class="row-urgent">${rowHTML}</tr>`;
+        }
+    });
+
+    document.getElementById('count-delay-gatein').innerText = countGateIn + " Item";
+    document.getElementById('count-delay-booking').innerText = countBooking + " Item";
+}
+
+// 3. JALANKAN TIMER DETIK (Sekali saja)
+if(window.delayInterval) clearInterval(window.delayInterval);
+window.delayInterval = setInterval(() => {
+    document.querySelectorAll('.realtime-tick').forEach(cell => {
+        cell.innerText = calculateDetailedDuration(cell.getAttribute('data-start'));
+    });
+}, 1000);
     </script>
 </body>
 </html>
