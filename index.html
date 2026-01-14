@@ -1516,6 +1516,7 @@
                                     <th>CATATAN</th>
                                     <th>OUTS</th>
                                     <th>GATE IN TIME</th>
+                                    <th>AKSI</th> </tr>
                                 </tr>
                             </thead>
                             <tbody id="histTableBody"></tbody>
@@ -2565,6 +2566,14 @@ function showDuplicateDNModal(dns) {
             <td style="color:#d97706; font-weight:600;">${item.catatan || '-'}</td>
             <td>${outstandingDesc}</td>
             <td style="color:#0f172a; font-weight:600;">${item.gateInTime || '-'}</td>
+            
+            <td style="text-align:center;">
+                <button type="button" onclick="editItem('${item.id}')" 
+                        style="background:#f59e0b; color:white; border:none; padding:6px 10px; border-radius:4px; cursor:pointer;" 
+                        title="Edit Data">
+                    <i class="fas fa-edit"></i>
+                </button>
+            </td>
         </tr>`;
     }).join('');
 
@@ -3103,33 +3112,32 @@ setInterval(() => {
 
 // Panggil fungsi refresh saat data monitoring diupdate (integrasikan dengan fungsi fetch existing)
 // Anda perlu memanggil refreshDelayList() di dalam fungsi onSnapshot atau getDocs Firestore Anda.
-// --- FUNGSI PENGHITUNG WAKTU REAL-TIME ---
+// --- FUNGSI PENGHITUNG DURASI (DIGUNAKAN OLEH SEMUA TABEL DELAY) ---
 function calculateDetailedDuration(startTime) {
     if (!startTime) return "-";
-    const start = new Date(startTime).getTime();
+    
+    // Mendukung format Firestore (seconds) atau Date string biasa
+    let startDate = (startTime.seconds) ? new Date(startTime.seconds * 1000) : new Date(startTime);
+    
     const now = new Date().getTime();
-    const diff = now - start;
+    const diff = now - startDate.getTime();
 
-    if (diff < 0) return "0j 0m 0d";
+    // Jika waktu belum tercapai
+    if (diff < 0) return "0h 0j 0m 0d";
 
-    const hours = Math.floor(diff / (1000 * 60 * 60));
+    // Konversi milidetik ke satuan waktu
+    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((diff % (1000 * 60)) / 1000);
 
-    return `${hours}j ${minutes}m ${seconds}d`;
-}
-
-// 1. FUNGSI HITUNG DURASI
-function calculateDetailedDuration(startTime) {
-    if (!startTime) return "-";
-    let startDate = (startTime.seconds) ? new Date(startTime.seconds * 1000) : new Date(startTime);
-    const diff = new Date().getTime() - startDate.getTime();
-
-    if (diff < 0) return "0j 0m 0d";
-    const hours = Math.floor(diff / 3600000);
-    const minutes = Math.floor((diff % 3600000) / 60000);
-    const seconds = Math.floor((diff % 60000) / 1000);
-    return `${hours}j ${minutes}m ${seconds}d`;
+    // Format Tampilan (Contoh: 1h 2j 30m 15d)
+    // h = Hari, j = Jam, m = Menit, d = Detik
+    if (days > 0) {
+        return `${days}h ${hours}j ${minutes}m ${seconds}d`;
+    } else {
+        return `${hours}j ${minutes}m ${seconds}d`;
+    }
 }
 
 // 2. FUNGSI RENDER TABEL (VERSI BERSIH & RAPI)
@@ -3202,6 +3210,20 @@ window.delayInterval = setInterval(() => {
         cell.innerText = calculateDetailedDuration(cell.getAttribute('data-start'));
     });
 }, 1000);
+// --- FUNGSI JEMBATAN UNTUK MEMBUKA MODAL EDIT DARI TABEL HISTORY ---
+function editHistoryItem(id) {
+    console.log("Memicu edit untuk ID:", id);
+    
+    // Kita panggil fungsi editItem asli yang sudah Anda temukan di kode
+    // Fungsi ini akan mengisi form dan mengaktifkan 'editModalOverlay'
+    if (typeof editItem === 'function') {
+        editItem(id);
+    } else {
+        // Jika fungsi tidak ditemukan karena urutan loading script
+        console.error("Fungsi editItem tidak terdeteksi!");
+        alert("Gagal memuat sistem edit. Silahkan refresh halaman.");
+    }
+}
     </script>
 </body>
 </html>
