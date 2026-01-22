@@ -1003,35 +1003,40 @@
 
                 <div class="dash-charts-container">
                     <div class="chart-box">
-                        <div class="chart-title"><i class="fa-solid fa-map"></i> Distribusi Area (History)</div>
+                        <div class="chart-title"><i class="fa-solid fa-map"></i> Distribusi Area </div>
                         <div class="canvas-wrapper"><canvas id="chartArea"></canvas></div>
                     </div>
                     <div class="chart-box">
-                        <div class="chart-title"><i class="fa-solid fa-truck"></i> Komposisi Armada (History)</div>
+                        <div class="chart-title"><i class="fa-solid fa-truck"></i> Komposisi Armada </div>
                         <div class="canvas-wrapper"><canvas id="chartArmada"></canvas></div>
                     </div>
+
+                    <div class="chart-box">
+                        <div class="chart-title" style="display:flex; justify-content:space-between; align-items:center;">
+                            <span><i class="fa-solid fa-chart-pie"></i> TOP 5 VENDOR (ON CALL)</span>
+                        </div>
+                        <div style="font-size: 0.7rem; color: #64748b; margin-bottom: 5px; padding-left: 10px;">
+                            Exclude: SILOG, YUSHAR, TFT, dll
+                        </div>
+                        <div class="canvas-wrapper"><canvas id="chartDashboardVendor"></canvas></div>
+                    </div>
+
+                    <div class="chart-box">
+                        <div class="chart-title" style="display:flex; justify-content:space-between; align-items:center;">
+                            <span><i class="fa-solid fa-file-signature"></i> TOP 5 VENDOR (KONTRAK)</span>
+                        </div>
+                        <div style="font-size: 0.7rem; color: #64748b; margin-bottom: 5px; padding-left: 10px;">
+                            Only: SILOG, TFT, SMJ, YUSHAR, ALIEF, TNJ, DEWI SRI
+                        </div>
+                        <div class="canvas-wrapper"><canvas id="chartVendorContract"></canvas></div>
+                    </div>
+
                     <div class="chart-box chart-full-width">
-                        <div class="chart-title"><i class="fa-solid fa-trophy"></i> Top 5 Customer (History)</div>
+                        <div class="chart-title"><i class="fa-solid fa-trophy"></i> Top 5 Customer </div>
                         <div class="canvas-wrapper"><canvas id="chartCustomer"></canvas></div>
                     </div>
                 </div>
-
-                <div style="margin-top: 20px; margin-bottom: 30px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 15px;">
-                        <h4 style="margin: 0; color: #1e293b; font-size: 1rem; font-weight: 700;">
-                            <i class="fa-solid fa-chart-pie" style="color: #3b82f6; margin-right: 8px;"></i> 
-                            TOP 5 VENDOR (ON CALL)
-                        </h4>
-                        <span style="font-size: 0.7rem; background: #f8fafc; color: #64748b; padding: 4px 8px; border-radius: 20px; border: 1px solid #e2e8f0;">
-                            Exclude: SILOG, YUSHAR, TFT, dll
-                        </span>
-                    </div>
-
-                    <div style="width: 100%; height: 280px; position: relative;">
-                        <canvas id="chartDashboardVendor"></canvas>
-                    </div>
-                </div>
-                </div>
+            </div>
             <div id="page-delay" class="page">
                 <div class="stats-container">
                     <div style="background: #fee2e2; border-left: 5px solid #dc2626; padding: 15px; border-radius: 6px; color: #7f1d1d; margin-bottom: 20px; width: 100%; box-sizing: border-box;">
@@ -1887,11 +1892,11 @@ const historyItemsPerPage = 100;
                 d.date <= end
             );
 
-            // Jika data kosong, reset semua
+            // Jika data kosong, reset semua grafik
             if (filteredData.length === 0) {
                 resetDashboardStats();
-                // Tetap panggil fungsi chart vendor agar grafiknya kosong (bersih)
-                renderDashboardVendorChart([]); 
+                renderDashboardVendorChart([]); // Reset grafik kiri
+                renderVendorContractChart([]);  // Reset grafik kanan
                 return;
             }
 
@@ -1942,9 +1947,13 @@ const historyItemsPerPage = 100;
             // Render Grafik Lama
             renderCharts(areaCounts, armadaCounts, sortedCust);
 
-            // --- BAGIAN BARU: RENDER GRAFIK VENDOR ---
-            // Ini akan memanggil fungsi di Langkah 2A tadi menggunakan data yang sudah difilter
+            // --- UPDATE BARU: PANGGIL KEDUA GRAFIK VENDOR ---
+            
+            // 1. Grafik Kiri (Non-Regular)
             renderDashboardVendorChart(filteredData);
+
+            // 2. Grafik Kanan (Kontrak: SILOG, dll)
+            renderVendorContractChart(filteredData);
         }
 
         function resetDashboardStats() {
@@ -3464,102 +3473,171 @@ function editHistoryItem(id) {
 
             doc.save(`REPORT_${type.toUpperCase()}_${new Date().toISOString().slice(0,10)}.pdf`);
         }
-        // ==========================================
-    // LOGIC CHART DASHBOARD (TOP 5 VENDOR HISTORY)
+        
+
     // ==========================================
-    
-    let dashboardChartInstance = null; // Variabel agar chart tidak tumpang tindih
+        // LOGIC CHART DASHBOARD (TOP 5 VENDOR NON-REGULAR) - UPDATE PADDING
+        // ==========================================
+        
+        let dashboardChartInstance = null; 
 
-    function renderDashboardVendorChart(sourceData) {
-        // 1. Cek apakah ada data
-        if (!sourceData || sourceData.length === 0) {
-                if (dashboardChartInstance) dashboardChartInstance.destroy();
-                return;
-        }
-
-        // 2. DAFTAR VENDOR YANG DI-EXCLUDE (HURUF BESAR)
-        // Tambahkan nama vendor lain di sini jika ingin disembunyikan
-        const ignoredList = [
-            "SILOG", "YUSHAR", "ALIEF", "TFT", 
-            "DEWI SRI", "TNJ", "SMJ", "KALOG"
-        ];
-
-        // 3. HITUNG JUMLAH TRIP
-        const counts = {};
-        sourceData.forEach(item => {
-            // Pastikan hanya membaca data yang valid
-            let vName = (item.vendor || "").toUpperCase().trim();
-            
-            // Syarat: Tidak kosong, bukan Belum Booking, dan TIDAK ada di daftar ignoredList
-            if (vName && vName !== "BELUM BOOKING" && !ignoredList.includes(vName)) {
-                counts[vName] = (counts[vName] || 0) + 1;
+        function renderDashboardVendorChart(sourceData) {
+            if (!sourceData || sourceData.length === 0) {
+                 if (dashboardChartInstance) dashboardChartInstance.destroy();
+                 return;
             }
-        });
 
-        // 4. URUTKAN DARI TERBANYAK & AMBIL 5 TERATAS
-        const sorted = Object.entries(counts)
-            .sort((a, b) => b[1] - a[1]) 
-            .slice(0, 5); 
+            const ignoredList = [
+                "SILOG", "YUSHAR", "ALIEF", "TFT", 
+                "DEWI SRI", "TNJ", "SMJ", "KALOG", "LOGISTIK", "LOGISTIC"
+            ];
 
-        // 5. RENDER KE CANVAS
-        const ctx = document.getElementById('chartDashboardVendor');
-        if (!ctx) return;
+            const counts = {};
+            sourceData.forEach(item => {
+                let vName = (item.vendor || "").toUpperCase().trim();
+                if (vName && vName !== "BELUM BOOKING" && !ignoredList.some(ig => vName.includes(ig))) {
+                    counts[vName] = (counts[vName] || 0) + 1;
+                }
+            });
 
-        // Hapus chart lama jika ada
-        if (dashboardChartInstance) {
-            dashboardChartInstance.destroy();
-        }
+            const sorted = Object.entries(counts)
+                .sort((a, b) => b[1] - a[1]) 
+                .slice(0, 5); 
 
-        // Buat Chart Baru
-        dashboardChartInstance = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: sorted.map(i => i[0]), // Nama Vendor
-                datasets: [{
-                    label: 'Total Trip',
-                    data: sorted.map(i => i[1]), // Jumlah Trip
-                    backgroundColor: [
-                        'rgba(59, 130, 246, 0.8)', // Biru
-                        'rgba(16, 185, 129, 0.8)', // Hijau
-                        'rgba(245, 158, 11, 0.8)', // Oranye
-                        'rgba(239, 68, 68, 0.8)',  // Merah
-                        'rgba(139, 92, 246, 0.8)'  // Ungu
-                    ],
-                    borderColor: [
-                        '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'
-                    ],
-                    borderWidth: 1,
-                    borderRadius: 4
-                }]
-            },
-            options: {
-                indexAxis: 'y', // PENTING: Membuat grafik jadi HORIZONTAL
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        callbacks: {
-                            label: function(c) { return c.raw + ' Trip'; }
+            const ctx = document.getElementById('chartDashboardVendor');
+            if (!ctx) return;
+
+            if (dashboardChartInstance) {
+                dashboardChartInstance.destroy();
+            }
+
+            dashboardChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sorted.map(i => i[0]),
+                    datasets: [{
+                        label: 'Total Trip',
+                        data: sorted.map(i => i[1]),
+                        backgroundColor: [
+                            'rgba(59, 130, 246, 0.8)', 'rgba(16, 185, 129, 0.8)', 
+                            'rgba(245, 158, 11, 0.8)', 'rgba(239, 68, 68, 0.8)', 
+                            'rgba(139, 92, 246, 0.8)'
+                        ],
+                        borderColor: [
+                            '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'
+                        ],
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    // === TAMBAHAN PADDING DI SINI ===
+                    layout: {
+                        padding: {
+                            right: 35 // Memberi jarak 35px di kanan agar angka tidak terpotong
                         }
                     },
-                    // Menampilkan angka di ujung batang
-                    datalabels: {
-                        anchor: 'end',
-                        align: 'end',
-                        color: '#334155',
-                        font: { weight: 'bold', size: 11 },
-                        formatter: Math.round
+                    // ================================
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: { label: function(c) { return c.raw + ' Trip'; } }
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'end',
+                            color: '#334155',
+                            font: { weight: 'bold', size: 11 },
+                            formatter: Math.round
+                        }
+                    },
+                    scales: {
+                        x: { display: false, grid: { display: false } },
+                        y: { grid: { display: false } }
                     }
                 },
-                scales: {
-                    x: { display: false, grid: { display: false } }, // Sembunyikan garis bawah
-                    y: { grid: { display: false } } // Sembunyikan garis samping
+                plugins: [ChartDataLabels]
+            });
+        }
+    // ==========================================
+        // LOGIC CHART: TOP 5 VENDOR KONTRAK (UPDATE PADDING)
+        // ==========================================
+        
+        let contractChartInstance = null;
+
+        function renderVendorContractChart(sourceData) {
+            if (!sourceData || sourceData.length === 0) {
+                 if (contractChartInstance) contractChartInstance.destroy();
+                 return;
+            }
+
+            // Tambahkan variasi nama jika perlu (misal "PT. SILOG" dan "SILOG")
+            const contractList = [
+                "SILOG", "TFT", "TF", "SMJ", "YUSHAR", 
+                "ALIEF", "TNJ", "DEWI SRI"
+            ];
+
+            const counts = {};
+            sourceData.forEach(item => {
+                let vName = (item.vendor || "").toUpperCase().trim();
+                // Cek apakah nama vendor mengandung salah satu kata di contractList
+                if (contractList.some(c => vName.includes(c))) {
+                    counts[vName] = (counts[vName] || 0) + 1;
                 }
-            },
-            plugins: [ChartDataLabels] // Aktifkan plugin label angka
-        });
-    }
+            });
+
+            const sorted = Object.entries(counts)
+                .sort((a, b) => b[1] - a[1]) 
+                .slice(0, 5); 
+
+            const ctx = document.getElementById('chartVendorContract');
+            if (!ctx) return;
+
+            if (contractChartInstance) contractChartInstance.destroy();
+
+            contractChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: sorted.map(i => i[0]),
+                    datasets: [{
+                        label: 'Total Trip',
+                        data: sorted.map(i => i[1]),
+                        backgroundColor: [
+                            '#0d9488', '#059669', '#16a34a', '#65a30d', '#ca8a04'
+                        ],
+                        borderWidth: 0,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    // === TAMBAHAN PADDING DI SINI ===
+                    layout: {
+                        padding: {
+                            right: 35 // Memberi jarak 35px di kanan
+                        }
+                    },
+                    // ================================
+                    plugins: {
+                        legend: { display: false },
+                        datalabels: {
+                            anchor: 'end', align: 'end', color: '#334155',
+                            font: { weight: 'bold', size: 10 }, formatter: Math.round
+                        }
+                    },
+                    scales: {
+                        x: { display: false, grid: { display: false } },
+                        y: { grid: { display: false } }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
     </script>
 </body>
 </html>
