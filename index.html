@@ -9,6 +9,9 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
     
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -18,13 +21,13 @@
 
     <style>
         .btn-edit-history {
-    background: #f59e0b; /* Warna Oranye */
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-}
+            background: #f59e0b; /* Warna Oranye */
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
 .btn-edit-history:hover {
     background: #d97706;
 }
@@ -640,6 +643,9 @@
         .st-pend { border-left: 4px solid #f59e0b; } .st-pend .st-icon-box { background: #fffbeb; color: #f59e0b; }
         .st-canc { border-left: 4px solid #ef4444; } .st-canc .st-icon-box { background: #fef2f2; color: #ef4444; }
         .st-tona { border-left: 4px solid #06b6d4; } .st-tona .st-icon-box { background: #ecfeff; color: #06b6d4; }
+        /* --- TAMBAHAN BARU: Style Box Belum Booking (Pink) --- */
+        .st-unbooked { border-left: 4px solid #db2777; } 
+        .st-unbooked .st-icon-box { background: #fce7f3; color: #db2777; }
 
 
         /* --- 9. MODALS --- */
@@ -1009,73 +1015,123 @@
                         <div class="canvas-wrapper"><canvas id="chartCustomer"></canvas></div>
                     </div>
                 </div>
-            </div>
+
+                <div style="margin-top: 20px; margin-bottom: 30px; background: #fff; padding: 15px; border-radius: 8px; border: 1px solid #cbd5e1; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; margin-bottom: 15px;">
+                        <h4 style="margin: 0; color: #1e293b; font-size: 1rem; font-weight: 700;">
+                            <i class="fa-solid fa-chart-pie" style="color: #3b82f6; margin-right: 8px;"></i> 
+                            TOP 5 VENDOR (ON CALL)
+                        </h4>
+                        <span style="font-size: 0.7rem; background: #f8fafc; color: #64748b; padding: 4px 8px; border-radius: 20px; border: 1px solid #e2e8f0;">
+                            Exclude: SILOG, YUSHAR, TFT, dll
+                        </span>
+                    </div>
+
+                    <div style="width: 100%; height: 280px; position: relative;">
+                        <canvas id="chartDashboardVendor"></canvas>
+                    </div>
+                </div>
+                </div>
             <div id="page-delay" class="page">
-    <div class="stats-container">
-        <div style="background: #fee2e2; border-left: 5px solid #dc2626; padding: 15px; border-radius: 6px; color: #7f1d1d; margin-bottom: 20px; width: 100%; box-sizing: border-box;">
-            <i class="fa-solid fa-triangle-exclamation"></i> 
-            <strong>Monitoring Delay:</strong> Durasi dihitung otomatis dari waktu data dibuat (Created At). Gunakan tombol edit untuk memperbarui catatan secara manual.
-        </div>
-    </div>
+                <div class="stats-container">
+                    <div style="background: #fee2e2; border-left: 5px solid #dc2626; padding: 15px; border-radius: 6px; color: #7f1d1d; margin-bottom: 20px; width: 100%; box-sizing: border-box;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> 
+                        <strong>Monitoring Delay:</strong> Durasi dihitung otomatis. Gunakan tombol kecil di sebelah judul untuk unduh laporan.
+                    </div>
+                </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; align-items: start;">
-        
-        <div class="delay-box" style="width: 100%; margin: 0; min-width: 0;">
-            <div class="delay-header">
-                <span><i class="fa-solid fa-clock"></i> DELAY GATE IN (> 6 Jam)</span>
-                <span id="count-delay-gatein" style="background:white; padding:2px 8px; border-radius:10px; font-size:0.75rem;">0 Item</span>
-            </div>
-            <div class="table-responsive" style="max-height: 70vh; overflow: auto;">
-                <table class="main-data-table" style="width: 100%; white-space: nowrap;">
-                    <thead>
-    <tr>
-        <th>Created At</th>
-        <th>Total Durasi</th>
-        <th>No DN</th>
-        <th>Vendor</th>
-        <th>Armada</th>
-        <th>Kota</th>
-        <th>Area</th>
-        <th>Customer</th>
-        <th>Qty</th>
-        <th>Catatan</th>
-        <th>Aksi</th>
-    </tr>
-</thead>
-                    <tbody id="tbody-delay-gatein"></tbody>
-                </table>
-            </div>
-        </div>
+                <div class="delay-container" style="align-items: flex-start;">
+                    
+                    <div class="delay-box" style="width: 100%; margin: 0; min-width: 0;">
+                        <div class="delay-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                            
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span><i class="fa-solid fa-clock"></i> DELAY GATE IN (> 6 Jam)</span>
+                                
+                                <div style="display: flex; gap: 5px;">
+                                    <button onclick="downloadDelayJPG('gatein')" style="border: 1px solid #fca5a5; background: white; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 0.7rem; color: #334155;" title="Download JPG">
+                                        <i class="fa-solid fa-image" style="color: #2563eb;"></i>
+                                    </button>
+                                    <button onclick="downloadDelayExcel('gatein')" style="border: 1px solid #fca5a5; background: white; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 0.7rem; color: #334155;" title="Download Excel">
+                                        <i class="fa-solid fa-file-excel" style="color: #16a34a;"></i>
+                                    </button>
+                                    <button onclick="downloadDelayPDF('gatein')" style="border: 1px solid #fca5a5; background: white; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 0.7rem; color: #334155;" title="Download PDF">
+                                        <i class="fa-solid fa-file-pdf" style="color: #dc2626;"></i>
+                                    </button>
+                                </div>
+                            </div>
 
-        <div class="delay-box" style="width: 100%; margin: 0; min-width: 0;">
-            <div class="delay-header">
-                <span><i class="fa-solid fa-user-clock"></i> DELAY BOOKING (> 2 Jam)</span>
-                <span id="count-delay-booking" style="background:white; padding:2px 8px; border-radius:10px; font-size:0.75rem;">0 Item</span>
-            </div>
-            <div class="table-responsive" style="max-height: 70vh; overflow: auto;">
-                <table class="main-data-table" style="width: 100%; white-space: nowrap;">
-                    <thead>
-    <tr>
-        <th>Created At</th>
-        <th>Total Durasi</th>
-        <th>No DN</th>
-        <th>Vendor</th>
-        <th>Armada</th>
-        <th>Kota</th>
-        <th>Area</th>
-        <th>Customer</th>
-        <th>Qty</th>
-        <th>Catatan</th>
-        <th>Aksi</th>
-    </tr>
-</thead>
-                    <tbody id="tbody-delay-booking"></tbody>
-                </table>
-            </div>
-        </div>
+                            <span id="count-delay-gatein" style="background:white; color:#991b1b; border:1px solid #fca5a5; padding:2px 8px; border-radius:10px; font-size:0.75rem; font-weight:700;">0 Item</span>
+                        </div>
+                        
+                        <div class="table-responsive" style="max-height: 70vh; overflow: auto;">
+                            <table class="main-data-table" id="table-delay-gatein" style="width: 100%; white-space: nowrap;">
+                                <thead>
+                                    <tr>
+                                        <th>Created At</th>
+                                        <th>Total Durasi</th>
+                                        <th>No DN</th>
+                                        <th>Vendor</th>
+                                        <th>Armada</th>
+                                        <th>Kota</th>
+                                        <th>Area</th>
+                                        <th>Customer</th>
+                                        <th>Qty</th>
+                                        <th>Catatan</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-delay-gatein"></tbody>
+                            </table>
+                        </div>
+                    </div>
 
-    </div>
-</div>
+                    <div class="delay-box" style="width: 100%; margin: 0; min-width: 0;">
+                        <div class="delay-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                            
+                            <div style="display: flex; align-items: center; gap: 15px;">
+                                <span><i class="fa-solid fa-user-clock"></i> DELAY BOOKING (> 2 Jam)</span>
+                                
+                                <div style="display: flex; gap: 5px;">
+                                    <button onclick="downloadDelayJPG('booking')" style="border: 1px solid #fca5a5; background: white; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 0.7rem; color: #334155;" title="Download JPG">
+                                        <i class="fa-solid fa-image" style="color: #2563eb;"></i>
+                                    </button>
+                                    <button onclick="downloadDelayExcel('booking')" style="border: 1px solid #fca5a5; background: white; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 0.7rem; color: #334155;" title="Download Excel">
+                                        <i class="fa-solid fa-file-excel" style="color: #16a34a;"></i>
+                                    </button>
+                                    <button onclick="downloadDelayPDF('booking')" style="border: 1px solid #fca5a5; background: white; border-radius: 4px; padding: 2px 8px; cursor: pointer; font-size: 0.7rem; color: #334155;" title="Download PDF">
+                                        <i class="fa-solid fa-file-pdf" style="color: #dc2626;"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <span id="count-delay-booking" style="background:white; color:#991b1b; border:1px solid #fca5a5; padding:2px 8px; border-radius:10px; font-size:0.75rem; font-weight:700;">0 Item</span>
+                        </div>
+
+                        <div class="table-responsive" style="max-height: 70vh; overflow: auto;">
+                            <table class="main-data-table" id="table-delay-booking" style="width: 100%; white-space: nowrap;">
+                                <thead>
+                                    <tr>
+                                        <th>Created At</th>
+                                        <th>Total Durasi</th>
+                                        <th>No DN</th>
+                                        <th>Vendor</th>
+                                        <th>Armada</th>
+                                        <th>Kota</th>
+                                        <th>Area</th>
+                                        <th>Customer</th>
+                                        <th>Qty</th>
+                                        <th>Catatan</th>
+                                        <th>Aksi</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tbody-delay-booking"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
 
             <div id="page-planning" class="page">
                 <div class="card">
@@ -1207,7 +1263,7 @@
 
             <div id="page-monitoring" class="page">
                 <div class="stats-container">
-                    <div class="stats-row row-3-cols">
+                    <div class="stats-row row-4-cols">
                         <div class="stat-new-card st-plan">
                             <div class="st-icon-box"><i class="fa-solid fa-truck"></i></div>
                             <div class="st-content">
@@ -1227,6 +1283,14 @@
                             <div class="st-content">
                                 <h4>TOTAL PLANNING</h4>
                                 <p id="s-row1-total">0</p>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-new-card st-unbooked">
+                            <div class="st-icon-box"><i class="fa-solid fa-user-slash"></i></div>
+                            <div class="st-content">
+                                <h4>BELUM BOOKING</h4>
+                                <p id="s-row1-unbooked">0</p>
                             </div>
                         </div>
                     </div>
@@ -1273,7 +1337,17 @@
                         <input type="text" id="sf-area" list="list-area-options" placeholder="Area..." onkeyup="updateMonitoring()">
                         <input type="text" id="sf-city" placeholder="Kota..." onkeyup="updateMonitoring()">
                         <input type="text" id="sf-customer" placeholder="Customer..." onkeyup="updateMonitoring()">
-                        <input type="text" id="sf-catatan" list="list-history-catatan" placeholder="Catatan..." onkeyup="updateMonitoring()">
+                        
+                        <div style="display: flex; gap: 5px; min-width: 130px;">
+                            <select id="sf-catatan-select" onchange="toggleCatatanInput()" style="width: 100%; font-size: 0.75rem; padding: 8px; border: 1px solid #cbd5e1; border-radius: 4px;">
+                                <option value="">Semua Catatan</option>
+                                <option value="NEXT DAY">NEXT DAY</option>
+                                <option value="AMBIL SENDIRI">AMBIL SENDIRI</option>
+                                <option value="ATUR KIRIM">ATUR KIRIM (Selain ND/AS)</option>
+                                <option value="MANUAL">Input Manual...</option>
+                            </select>
+                            <input type="text" id="sf-catatan-manual" placeholder="Ketik..." onkeyup="updateMonitoring()" style="display: none; width: 100%;">
+                        </div>
                         <select id="sf-outs" onchange="updateMonitoring()">
                             <option value=""> Pilih</option>
                             <option value="YES">Outstanding Only</option>
@@ -1806,17 +1880,22 @@ const historyItemsPerPage = 100;
                 document.getElementById('dash-end').value = end; 
             }
 
+            // 1. Ambil Data Sesuai Tanggal & Status Gate In
             const filteredData = allShipments.filter(d => 
                 d.status === 'Gate In' && 
                 d.date >= start && 
                 d.date <= end
             );
 
+            // Jika data kosong, reset semua
             if (filteredData.length === 0) {
                 resetDashboardStats();
+                // Tetap panggil fungsi chart vendor agar grafiknya kosong (bersih)
+                renderDashboardVendorChart([]); 
                 return;
             }
 
+            // 2. Hitung Statistik Angka (Kotak-kotak atas)
             const vendors = new Set();
             let totalTonase = 0;
             let totalDN = filteredData.length;
@@ -1834,6 +1913,7 @@ const historyItemsPerPage = 100;
             document.getElementById('d-val-dn').innerText = formatNumber(totalDN);
             document.getElementById('d-val-avg').innerText = formatNumber(Math.round(avgQty));
 
+            // 3. Siapkan Data untuk Grafik Lama (Area, Armada, Customer)
             const areaCounts = {}; 
             ["JABODETABEK", "JAWA TENGAH", "JAWA TIMUR", "LUAR PULAU", "AMBIL SENDIRI"].forEach(a => areaCounts[a] = 0);
             
@@ -1858,7 +1938,13 @@ const historyItemsPerPage = 100;
             });
 
             const sortedCust = Object.entries(custMap).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            
+            // Render Grafik Lama
             renderCharts(areaCounts, armadaCounts, sortedCust);
+
+            // --- BAGIAN BARU: RENDER GRAFIK VENDOR ---
+            // Ini akan memanggil fungsi di Langkah 2A tadi menggunakan data yang sudah difilter
+            renderDashboardVendorChart(filteredData);
         }
 
         function resetDashboardStats() {
@@ -2345,97 +2431,110 @@ function showDuplicateDNModal(dns) {
         }
 
         // --- 9. MONITORING FUNCTIONS ---
+        // 1. Fungsi untuk mengatur tampilan input manual vs dropdown
+        function toggleCatatanInput() {
+            const mode = document.getElementById('sf-catatan-select').value;
+            const manualInput = document.getElementById('sf-catatan-manual');
+            const selectBox = document.getElementById('sf-catatan-select');
+
+            if (mode === 'MANUAL') {
+                selectBox.style.width = '40%'; 
+                manualInput.style.display = 'block'; 
+                manualInput.style.width = '60%';
+                manualInput.focus();
+            } else {
+                selectBox.style.width = '100%';
+                manualInput.style.display = 'none';
+                manualInput.value = ''; 
+                updateMonitoring(); 
+            }
+        }
+
+        // 2. Fungsi Update Monitoring (VERSI BARU - Logic "ATUR KIRIM")
         function updateMonitoring() {
-            // -- ORIGINAL FILTERS --
+            // Filter Lama
             const q = document.getElementById('monSearch').value.toLowerCase();
             const filterVal = document.getElementById('filterStatus').value;
 
-            // -- NEW SMART FILTERS (sf-) --
+            // Filter Baru (Smart Filters)
             const sfVendor = document.getElementById('sf-vendor').value.toLowerCase();
             const sfArmada = document.getElementById('sf-armada').value.toLowerCase();
             const sfArea = document.getElementById('sf-area').value.toLowerCase();
             const sfCity = document.getElementById('sf-city').value.toLowerCase();
             const sfCustomer = document.getElementById('sf-customer').value.toLowerCase();
-            const sfCatatan = document.getElementById('sf-catatan').value.toLowerCase();
+            
+            // Logika Catatan
+            const sfCatatanMode = document.getElementById('sf-catatan-select').value;
+            const sfCatatanManual = document.getElementById('sf-catatan-manual').value.toLowerCase();
             const sfOuts = document.getElementById('sf-outs').value;
 
-            // Variables for the NEW Statistics
-            let countTotalJobs = 0; // Total Planning (All)
-            let countRegularPlanning = 0; // Planning (Excl Ambil Sendiri)
-            let countSelfPickup = 0; // Ambil Sendiri
-            
-            let countGateIn = 0;
-            let countPending = 0;
-            let countCancel = 0;
-            let totalTonase = 0;
+            // --- VARIABEL STATISTIK (Update) ---
+            let countTotalJobs = 0, countRegularPlanning = 0, countSelfPickup = 0;
+            let countBelumBooking = 0; // <--- VARIABEL BARU DITAMBAHKAN
+            let countGateIn = 0, countPending = 0, countCancel = 0, totalTonase = 0;
 
             const filteredForTable = allShipments.filter(item => {
                 if (item.archived) return false;
 
-                // 1. Search Bar Logic
+                // Search Global
                 const allValues = Object.values(item).join(' ').toLowerCase();
-                const matchesSearch = allValues.includes(q);
+                if (!allValues.includes(q)) return false;
 
-                // 2. Status Dropdown Logic
-                let matchesStatus = true; 
+                // Filter Status Dropdown Atas
                 if (filterVal !== "") {
-                    if (filterVal === 'Belum Masuk') matchesStatus = (item.status === 'Belum Masuk' || item.status === 'Planning');
-                    else matchesStatus = (item.status === filterVal);
+                    if (filterVal === 'Belum Masuk') {
+                        if (item.status !== 'Belum Masuk' && item.status !== 'Planning') return false;
+                    } else if (item.status !== filterVal) return false;
                 }
 
-                // 3. Smart Filter Logics (AND Condition)
-                // Vendor
-                const matchVendor = !sfVendor || (item.vendor || "").toLowerCase().includes(sfVendor);
-                // Armada
-                const matchArmada = !sfArmada || (item.truck || "").toLowerCase().includes(sfArmada);
-                // Area
-                const matchArea = !sfArea || (item.area || "").toLowerCase().includes(sfArea);
-                // City
-                const matchCity = !sfCity || (item.city || "").toLowerCase().includes(sfCity);
-                // Customer
-                const matchCustomer = !sfCustomer || (item.customer || "").toLowerCase().includes(sfCustomer);
-                // Catatan
-                const matchCatatan = !sfCatatan || (item.catatan || "").toLowerCase().includes(sfCatatan);
-                
-                // Outs Logic
-                let matchOuts = true;
-                if (sfOuts === 'YES') {
-                    // Hanya tampilkan yang Outstanding (Original Date ada dan beda dengan Current Date)
-                    matchOuts = (item.originalDate && item.originalDate !== item.date);
-                } else if (sfOuts === 'NO') {
-                    // Hanya tampilkan yang TIDAK Outstanding
-                    matchOuts = (!item.originalDate || item.originalDate === item.date);
-                }
+                // Smart Filters
+                if (sfVendor && !(item.vendor || "").toLowerCase().includes(sfVendor)) return false;
+                if (sfArmada && !(item.truck || "").toLowerCase().includes(sfArmada)) return false;
+                if (sfArea && !(item.area || "").toLowerCase().includes(sfArea)) return false;
+                if (sfCity && !(item.city || "").toLowerCase().includes(sfCity)) return false;
+                if (sfCustomer && !(item.customer || "").toLowerCase().includes(sfCustomer)) return false;
 
-                // Combine All
-                return matchesSearch && matchesStatus && matchVendor && matchArmada && matchArea && matchCity && matchCustomer && matchCatatan && matchOuts;
+                // Logika Catatan
+                const itemNote = (item.catatan || "").toUpperCase(); 
+                if (sfCatatanMode === 'NEXT DAY' && !itemNote.includes("NEXT DAY")) return false;
+                if (sfCatatanMode === 'AMBIL SENDIRI' && !itemNote.includes("AMBIL SENDIRI")) return false;
+                if (sfCatatanMode === 'ATUR KIRIM' && (itemNote.includes("NEXT DAY") || itemNote.includes("AMBIL SENDIRI"))) return false;
+                if (sfCatatanMode === 'MANUAL' && sfCatatanManual && !(item.catatan || "").toLowerCase().includes(sfCatatanManual)) return false;
+
+                // Filter Outstanding
+                if (sfOuts === 'YES' && (!item.originalDate || item.originalDate === item.date)) return false;
+                if (sfOuts === 'NO' && (item.originalDate && item.originalDate !== item.date)) return false;
+
+                return true;
             });
 
+            // Loop Hitung Statistik
             filteredForTable.forEach(item => {
                 countTotalJobs++;
-                
-                // --- 1. Stat Logic: Row 1 (Planning Breakdown) ---
                 let isSelfPickup = (item.catatan || "").toUpperCase().includes("AMBIL SENDIRI");
                 
-                if (isSelfPickup) {
-                    countSelfPickup++;
-                } else {
-                    countRegularPlanning++;
+                if (isSelfPickup) countSelfPickup++; 
+                else countRegularPlanning++;
+
+                // --- LOGIKA HITUNG BELUM BOOKING (BARU) ---
+                // Cek jika kolom vendor isinya "BELUM BOOKING"
+                if (item.vendor === "BELUM BOOKING") {
+                    countBelumBooking++;
                 }
 
-                // --- 2. Stat Logic: Row 2 (Status Breakdown) ---
                 if (item.status === 'Gate In') countGateIn++;
                 if (item.status === 'Belum Masuk' || item.status === 'Planning') countPending++;
                 if (item.status === 'Cancelled') countCancel++;
-                
-                // --- 3. Stat Logic: Tonase (Excl Cancelled) ---
                 if (item.status !== 'Cancelled') totalTonase += parseFloat(item.qty || 0);
             });
 
-            // Update DOM Elements for Statistics
+            // Update Tampilan Angka Statistik
             document.getElementById('s-row1-planning').innerText = countRegularPlanning;
             document.getElementById('s-row1-self').innerText = countSelfPickup;
             document.getElementById('s-row1-total').innerText = countTotalJobs;
+            
+            // UPDATE ELEMENT STATISTIK BARU
+            document.getElementById('s-row1-unbooked').innerText = countBelumBooking; 
 
             document.getElementById('s-row2-gatein').innerText = countGateIn;
             document.getElementById('s-row2-pending').innerText = countPending;
@@ -2444,27 +2543,18 @@ function showDuplicateDNModal(dns) {
 
             // Render Table
             const tableBody = document.getElementById('monTableBody');
-
             if (filteredForTable.length === 0) {
                 tableBody.innerHTML = `<tr><td colspan="16" style="padding: 40px; text-align: center; color: #94a3b8;"><i class="fa-solid fa-clipboard-list" style="font-size:3rem; margin-bottom:10px;"></i><br>BELUM ADA DATA / TIDAK DITEMUKAN</td></tr>`;
                 return;
             }
 
             tableBody.innerHTML = filteredForTable.map((item, idx) => {
-                let statusClass = 'status-planning'; 
-                if (item.status === 'Gate In') statusClass = 'status-gatein'; 
-                else if (item.status === 'Cancelled') statusClass = 'status-cancelled'; 
-
+                let statusClass = item.status === 'Gate In' ? 'status-gatein' : (item.status === 'Cancelled' ? 'status-cancelled' : 'status-planning');
                 let statusLabel = item.status === 'Cancelled' ? 'CANCEL' : item.status;
                 let vendorDisplay = item.vendor === "BELUM BOOKING" ? `<span style="color:#ef4444; font-weight:700;">BELUM BOOKING</span>` : item.vendor;
-                
-                let outstandingDesc = '-';
-                if (item.originalDate && item.originalDate !== item.date) {
-                    outstandingDesc = `<span class="text-outstanding">Outstanding ${item.originalDate}</span>`;
-                }
+                let outstandingDesc = (item.originalDate && item.originalDate !== item.date) ? `<span class="text-outstanding">Outstanding ${item.originalDate}</span>` : '-';
 
-                return `
-                <tr>
+                return `<tr>
                     <td><input type="checkbox" class="row-check" value="${item.id}" style="cursor:pointer;"></td>
                     <td>${idx + 1}</td>
                     <td style="font-weight:600;">${item.dns}</td>
@@ -2485,13 +2575,19 @@ function showDuplicateDNModal(dns) {
             }).join('');
         }
 
+        // 3. Update Fungsi Reset Filter
         function resetSmartFilters() {
             document.getElementById('sf-vendor').value = "";
             document.getElementById('sf-armada').value = "";
             document.getElementById('sf-area').value = "";
             document.getElementById('sf-city').value = "";
             document.getElementById('sf-customer').value = "";
-            document.getElementById('sf-catatan').value = "";
+            
+            // RESET BAGIAN CATATAN BARU
+            document.getElementById('sf-catatan-select').value = "";
+            document.getElementById('sf-catatan-manual').value = "";
+            toggleCatatanInput(); 
+
             document.getElementById('sf-outs').value = "";
             updateMonitoring();
         }
@@ -3224,6 +3320,246 @@ function editHistoryItem(id) {
         alert("Gagal memuat sistem edit. Silahkan refresh halaman.");
     }
 }
+// ==========================================
+        // FITUR DOWNLOAD DELAY LIST (JPG, EXCEL, PDF)
+        // ==========================================
+
+        // 1. DOWNLOAD JPG (Gambar)
+        // 1. DOWNLOAD JPG (REVISI WARNA HEADER MERAH)
+        function downloadDelayJPG(type) {
+            const tableId = type === 'gatein' ? 'table-delay-gatein' : 'table-delay-booking';
+            const sourceTable = document.getElementById(tableId);
+            
+            if(!sourceTable) return;
+
+            // Buat container sementara
+            const wrapper = document.createElement('div');
+            wrapper.style.position = 'fixed';
+            wrapper.style.top = '-9999px';
+            wrapper.style.left = '0';
+            wrapper.style.width = '1400px'; 
+            wrapper.style.background = '#ffffff';
+            wrapper.style.padding = '20px';
+            wrapper.style.zIndex = '9999';
+            
+            // Judul Gambar
+            const title = document.createElement('h3');
+            title.innerText = type === 'gatein' ? 'REPORT DELAY GATE IN (> 6 JAM)' : 'REPORT DELAY BOOKING (> 2 JAM)';
+            title.style.fontFamily = 'sans-serif';
+            title.style.color = '#1e293b';
+            title.style.borderBottom = '2px solid #b91c1c'; // Garis merah
+            title.style.paddingBottom = '10px';
+            wrapper.appendChild(title);
+
+            // Clone tabel
+            const clonedTable = sourceTable.cloneNode(true);
+            
+            // --- BAGIAN PERBAIKAN WARNA HEADER ---
+            const headers = clonedTable.querySelectorAll('th');
+            headers.forEach(th => {
+                th.style.position = 'static'; // Matikan sticky agar tidak berantakan
+                // PAKSA warna merah dengan !important agar tidak tertimpa CSS bawaan (hijau/teal)
+                th.style.setProperty('background-color', '#b91c1c', 'important'); 
+                th.style.setProperty('color', '#ffffff', 'important');
+                th.style.setProperty('border', '1px solid #000', 'important');
+            });
+
+            // Styling Cell Body
+            const cells = clonedTable.querySelectorAll('td');
+            cells.forEach(td => {
+                td.style.border = '1px solid #000'; // Border hitam tegas
+                td.style.color = '#000'; // Text hitam
+            });
+
+            // Hapus kolom 'Aksi'
+            const rows = clonedTable.querySelectorAll('tr');
+            rows.forEach(row => { if(row.cells.length > 0) row.deleteCell(-1); }); 
+            
+            clonedTable.style.width = '100%';
+            clonedTable.style.borderCollapse = 'collapse';
+
+            wrapper.appendChild(clonedTable);
+            document.body.appendChild(wrapper);
+
+            // Proses Foto
+            html2canvas(wrapper, { scale: 2 }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `DELAY_${type.toUpperCase()}_${new Date().toISOString().slice(0,10)}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 1.0);
+                link.click();
+                document.body.removeChild(wrapper); 
+            });
+        }
+
+        // 2. DOWNLOAD EXCEL
+        function downloadDelayExcel(type) {
+            const tableId = type === 'gatein' ? 'table-delay-gatein' : 'table-delay-booking';
+            const table = document.getElementById(tableId);
+            if(!table) return;
+
+            const clone = table.cloneNode(true);
+            
+            // Hapus kolom aksi
+            const rows = clone.querySelectorAll('tr');
+            rows.forEach(row => { if(row.cells.length > 0) row.deleteCell(-1); }); 
+
+            // Styling Header Excel
+            const headers = clone.querySelectorAll('th');
+            headers.forEach(th => { th.style.background = "#b91c1c"; th.style.color = "#fff"; th.style.border = "1px solid #000"; });
+            
+            // Styling Cell Excel
+            const tds = clone.querySelectorAll('td');
+            tds.forEach(td => { td.style.border = "1px solid #000"; td.setAttribute('x:str', ''); });
+
+            const html = clone.outerHTML;
+            const url = 'data:application/vnd.ms-excel;charset=utf-8,' + encodeURIComponent(html);
+            const link = document.createElement('a');
+            link.download = `DATA_DELAY_${type.toUpperCase()}_${new Date().toISOString().slice(0,10)}.xls`;
+            link.href = url;
+            link.click();
+        }
+
+        // 3. DOWNLOAD PDF
+        function downloadDelayPDF(type) {
+            // Pastikan library jsPDF sudah diload di <head>
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('l', 'mm', 'a4'); // Landscape, mm, A4
+
+            const tableId = type === 'gatein' ? 'table-delay-gatein' : 'table-delay-booking';
+            const titleText = type === 'gatein' ? 'LAPORAN DELAY GATE IN (> 6 JAM)' : 'LAPORAN DELAY BOOKING (> 2 JAM)';
+
+            // Header Dokumen
+            doc.setFontSize(14);
+            doc.text(titleText, 14, 15);
+            doc.setFontSize(10);
+            doc.setTextColor(100);
+            doc.text(`Dicetak pada: ${new Date().toLocaleString('id-ID')}`, 14, 22);
+
+            // Generate Tabel
+            doc.autoTable({
+                html: '#' + tableId,
+                startY: 25,
+                theme: 'grid',
+                headStyles: { fillColor: [185, 28, 28], textColor: [255, 255, 255] }, // Merah & Putih
+                styles: { fontSize: 8, cellPadding: 2, lineColor: [200, 200, 200] },
+                columns: [
+                    { header: 'Created', dataKey: 0 },
+                    { header: 'Durasi', dataKey: 1 },
+                    { header: 'No DN', dataKey: 2 },
+                    { header: 'Vendor', dataKey: 3 },
+                    { header: 'Armada', dataKey: 4 },
+                    { header: 'Kota', dataKey: 5 },
+                    { header: 'Area', dataKey: 6 },
+                    { header: 'Cust', dataKey: 7 },
+                    { header: 'Qty', dataKey: 8 },
+                    { header: 'Catatan', dataKey: 9 }
+                ],
+                didParseCell: function (data) {
+                    // Sembunyikan kolom ke-10 (Aksi / Tombol Hapus)
+                    if (data.column.index === 10) {
+                        data.cell.styles.display = 'none';
+                    }
+                }
+            });
+
+            doc.save(`REPORT_${type.toUpperCase()}_${new Date().toISOString().slice(0,10)}.pdf`);
+        }
+        // ==========================================
+    // LOGIC CHART DASHBOARD (TOP 5 VENDOR HISTORY)
+    // ==========================================
+    
+    let dashboardChartInstance = null; // Variabel agar chart tidak tumpang tindih
+
+    function renderDashboardVendorChart(sourceData) {
+        // 1. Cek apakah ada data
+        if (!sourceData || sourceData.length === 0) {
+                if (dashboardChartInstance) dashboardChartInstance.destroy();
+                return;
+        }
+
+        // 2. DAFTAR VENDOR YANG DI-EXCLUDE (HURUF BESAR)
+        // Tambahkan nama vendor lain di sini jika ingin disembunyikan
+        const ignoredList = [
+            "SILOG", "YUSHAR", "ALIEF", "TFT", 
+            "DEWI SRI", "TNJ", "SMJ", "KALOG"
+        ];
+
+        // 3. HITUNG JUMLAH TRIP
+        const counts = {};
+        sourceData.forEach(item => {
+            // Pastikan hanya membaca data yang valid
+            let vName = (item.vendor || "").toUpperCase().trim();
+            
+            // Syarat: Tidak kosong, bukan Belum Booking, dan TIDAK ada di daftar ignoredList
+            if (vName && vName !== "BELUM BOOKING" && !ignoredList.includes(vName)) {
+                counts[vName] = (counts[vName] || 0) + 1;
+            }
+        });
+
+        // 4. URUTKAN DARI TERBANYAK & AMBIL 5 TERATAS
+        const sorted = Object.entries(counts)
+            .sort((a, b) => b[1] - a[1]) 
+            .slice(0, 5); 
+
+        // 5. RENDER KE CANVAS
+        const ctx = document.getElementById('chartDashboardVendor');
+        if (!ctx) return;
+
+        // Hapus chart lama jika ada
+        if (dashboardChartInstance) {
+            dashboardChartInstance.destroy();
+        }
+
+        // Buat Chart Baru
+        dashboardChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: sorted.map(i => i[0]), // Nama Vendor
+                datasets: [{
+                    label: 'Total Trip',
+                    data: sorted.map(i => i[1]), // Jumlah Trip
+                    backgroundColor: [
+                        'rgba(59, 130, 246, 0.8)', // Biru
+                        'rgba(16, 185, 129, 0.8)', // Hijau
+                        'rgba(245, 158, 11, 0.8)', // Oranye
+                        'rgba(239, 68, 68, 0.8)',  // Merah
+                        'rgba(139, 92, 246, 0.8)'  // Ungu
+                    ],
+                    borderColor: [
+                        '#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 4
+                }]
+            },
+            options: {
+                indexAxis: 'y', // PENTING: Membuat grafik jadi HORIZONTAL
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(c) { return c.raw + ' Trip'; }
+                        }
+                    },
+                    // Menampilkan angka di ujung batang
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'end',
+                        color: '#334155',
+                        font: { weight: 'bold', size: 11 },
+                        formatter: Math.round
+                    }
+                },
+                scales: {
+                    x: { display: false, grid: { display: false } }, // Sembunyikan garis bawah
+                    y: { grid: { display: false } } // Sembunyikan garis samping
+                }
+            },
+            plugins: [ChartDataLabels] // Aktifkan plugin label angka
+        });
+    }
     </script>
 </body>
 </html>
