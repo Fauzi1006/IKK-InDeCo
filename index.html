@@ -907,7 +907,7 @@
     <span style="margin-left:auto; background:#ef4444; color:white; font-size:0.6rem; padding:2px 6px; border-radius:4px;">URGENT</span>
 </a>
                 
-                <div class="menu-label">OPERATIONS</div>
+            <div class="menu-label">OPERATIONS</div>
                 <a onclick="showPage('planning', 'Delivery Planning')" class="nav-item" id="menu-planning" data-tooltip="Planning">
                     <i class="fa-solid fa-clipboard-list"></i>
                     <span>Planning</span>
@@ -925,6 +925,17 @@
                     <span>History</span>
                 </a>
                 
+                <div class="menu-label">KNOWLEDGE BASE</div>
+                
+                <a onclick="showPage('page-sop', 'SOP & Standards')" class="nav-item" id="menu-sop" data-tooltip="SOP">
+                    <i class="fa-solid fa-clipboard-check"></i>
+                    <span>SOP & Standar</span>
+                </a>
+
+                <a onclick="showPage('truck-types', 'Katalog Armada')" class="nav-item" id="menu-truck-types" data-tooltip="Jenis Truck">
+    <i class="fa-solid fa-truck-ramp-box"></i>
+    <span>Jenis Truck</span>
+</a>
                 <div class="menu-label">MASTER DATA</div>
                 <a onclick="showPage('route', 'Route Master')" class="nav-item" id="menu-route" data-tooltip="Routes">
                     <i class="fa-solid fa-map-location-dot"></i>
@@ -1608,7 +1619,295 @@
 
                 </div>
             </div>
-            
+            <div id="page-truck-types" class="page">
+    <div style="margin-bottom: 25px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">
+        <h2 style="margin: 0; color: #0f172a; font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px;">
+            <i class="fa-solid fa-truck-ramp-box" style="color: #2563eb; margin-right: 10px;"></i>
+            Katalog Armada (Focus: Roll & Box)
+        </h2>
+        <p style="color: #64748b; margin: 5px 0 0 0; font-size: 0.95rem;">
+            Spesifikasi angkutan khusus muatan <b>Jumbo Roll</b> dan <b>Karton Box</b>.
+        </p>
+    </div>
+
+    <div class="truck-catalog-controls" style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; background: white; padding: 15px; border-radius: 8px; border: 1px solid #e2e8f0;">
+        <div class="truck-search-box" style="position: relative; flex: 1; min-width: 300px;">
+            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+            <input type="text" id="inputTruckSearch" onkeyup="filterTrucks()" placeholder="Cari armada..." 
+                   style="width: 100%; padding: 12px 15px 12px 40px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9rem; background: #f8fafc;">
+        </div>
+        <div style="font-size: 0.75rem; color: #ef4444; font-weight: 600; display: flex; align-items: center; gap: 5px;">
+            <i class="fa-solid fa-scale-balanced"></i>
+            <span>NOTE: Pastikan tonase tidak melebihi regulasi jalan.</span>
+        </div>
+    </div>
+
+    <div class="truck-grid" id="truckGridContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px;">
+        
+        <div class="truck-card" style="background: white; border-radius: 12px; border: 1px solid #cbd5e1; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <div class="truck-img-wrapper" style="position: relative; height: 160px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+                <span style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight:bold;">MAX 25 TON</span>
+                <img src="image/TRONTON-WINGBOX.jpg" alt="Tronton Wingbox" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div class="truck-info-body" style="padding: 20px;">
+                <h3 class="truck-name" style="margin: 0 0 15px 0; font-size: 1.1rem; font-weight: 800; color: #0f172a;">Tronton Wingbox</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: #64748b;">Dimensi (PxLxT)</span>
+                        <span style="font-size: 0.8rem; font-weight: 700; color: #1e293b;">9.5 x 2.4 x 2.3 M</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: #64748b;">Kapasitas Muat</span>
+                        <span style="font-size: 0.8rem; font-weight: 800; color: #2563eb;">25 - 28 Ton</span>
+                    </div>
+                    <div style="background: #eff6ff; padding: 8px; border-radius: 6px; margin-top: 5px;">
+                        <span style="display: block; font-size: 0.7rem; font-weight: 700; color: #1e40af; margin-bottom: 4px;">MUATAN:</span>
+                        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                            <span style="background: white; border: 1px solid #bfdbfe; color: #1e3a8a; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">JUMBO ROLL</span>
+                            <span style="background: white; border: 1px solid #bfdbfe; color: #1e3a8a; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">KARTON BOX</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="truck-card" style="background: white; border-radius: 12px; border: 1px solid #cbd5e1; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <div class="truck-img-wrapper" style="position: relative; height: 160px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+                <span style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight:bold;">MAX 30 TON</span>
+                <img src="image/TRONTON-LOSSBAK.jpg" alt="Tronton Lossbak" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div class="truck-info-body" style="padding: 20px;">
+                <h3 class="truck-name" style="margin: 0 0 15px 0; font-size: 1.1rem; font-weight: 800; color: #0f172a;">Tronton Lossbak</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: #64748b;">Dimensi (PxL)</span>
+                        <span style="font-size: 0.8rem; font-weight: 700; color: #1e293b;">9.5 x 2.4 M (Flat)</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: #64748b;">Kapasitas Muat</span>
+                        <span style="font-size: 0.8rem; font-weight: 800; color: #2563eb;">28 - 30 Ton</span>
+                    </div>
+                    <div style="background: #f8fafc; padding: 8px; border-radius: 6px; margin-top: 5px;">
+                        <span style="display: block; font-size: 0.7rem; font-weight: 700; color: #475569; margin-bottom: 4px;">MUATAN:</span>
+                        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                            <span style="background: white; border: 1px solid #cbd5e1; color: #475569; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">JUMBO ROLL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="truck-card" style="background: white; border-radius: 12px; border: 1px solid #cbd5e1; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <div class="truck-img-wrapper" style="position: relative; height: 160px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+                <span style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight:bold;">MAX 35 TON</span>
+                <img src="image/TRAILER-FLATBED.jpg" alt="Trailer Flatbed" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div class="truck-info-body" style="padding: 20px;">
+                <h3 class="truck-name" style="margin: 0 0 15px 0; font-size: 1.1rem; font-weight: 800; color: #0f172a;">Trailer Flatbed 40"</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: #64748b;">Dimensi (PxL)</span>
+                        <span style="font-size: 0.8rem; font-weight: 700; color: #1e293b;">12 x 2.4 M (Flat)</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: #64748b;">Kapasitas Muat</span>
+                        <span style="font-size: 0.8rem; font-weight: 800; color: #2563eb;">30 - 35 Ton</span>
+                    </div>
+                    <div style="background: #f8fafc; padding: 8px; border-radius: 6px; margin-top: 5px;">
+                        <span style="display: block; font-size: 0.7rem; font-weight: 700; color: #475569; margin-bottom: 4px;">MUATAN:</span>
+                        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                            <span style="background: white; border: 1px solid #cbd5e1; color: #475569; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">JUMBO ROLL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="truck-card" style="background: white; border-radius: 12px; border: 1px solid #cbd5e1; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <div class="truck-img-wrapper" style="position: relative; height: 160px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+                <span style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight:bold;">MAX 30 TON</span>
+                <img src="image/CONTAINER-40-FEET.jpg" alt="Container 40ft" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div class="truck-info-body" style="padding: 20px;">
+                <h3 class="truck-name" style="margin: 0 0 15px 0; font-size: 1.1rem; font-weight: 800; color: #0f172a;">Container 40 Feet</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: #64748b;">Dimensi (PxLxT)</span>
+                        <span style="font-size: 0.8rem; font-weight: 700; color: #1e293b;">12 x 2.3 x 2.4 M</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: #64748b;">Kapasitas Muat</span>
+                        <span style="font-size: 0.8rem; font-weight: 800; color: #2563eb;">28 - 30 Ton</span>
+                    </div>
+                    <div style="background: #fff7ed; padding: 8px; border-radius: 6px; margin-top: 5px;">
+                        <span style="display: block; font-size: 0.7rem; font-weight: 700; color: #9a3412; margin-bottom: 4px;">MUATAN:</span>
+                        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                            <span style="background: white; border: 1px solid #fed7aa; color: #9a3412; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">JUMBO ROLL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="truck-card" style="background: white; border-radius: 12px; border: 1px solid #cbd5e1; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <div class="truck-img-wrapper" style="position: relative; height: 160px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+                <span style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight:bold;">MAX 28 TON</span>
+                <img src="image/CONTAINER-20-FEET.jpg" alt="Container 20ft" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div class="truck-info-body" style="padding: 20px;">
+                <h3 class="truck-name" style="margin: 0 0 15px 0; font-size: 1.1rem; font-weight: 800; color: #0f172a;">Container 20 Feet</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: #64748b;">Dimensi (PxLxT)</span>
+                        <span style="font-size: 0.8rem; font-weight: 700; color: #1e293b;">6 x 2.3 x 2.4 M</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: #64748b;">Kapasitas Muat</span>
+                        <span style="font-size: 0.8rem; font-weight: 800; color: #2563eb;">25 - 28 Ton</span>
+                    </div>
+                    <div style="background: #fff7ed; padding: 8px; border-radius: 6px; margin-top: 5px;">
+                        <span style="display: block; font-size: 0.7rem; font-weight: 700; color: #9a3412; margin-bottom: 4px;">MUATAN:</span>
+                        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                            <span style="background: white; border: 1px solid #fed7aa; color: #9a3412; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">JUMBO ROLL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="truck-card" style="background: white; border-radius: 12px; border: 1px solid #cbd5e1; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <div class="truck-img-wrapper" style="position: relative; height: 160px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+                <span style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight:bold;">MAX 6 TON</span>
+                <img src="image/CDD-LONG.jpg" alt="CDD Long" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div class="truck-info-body" style="padding: 20px;">
+                <h3 class="truck-name" style="margin: 0 0 15px 0; font-size: 1.1rem; font-weight: 800; color: #0f172a;">CDD Long Chassis</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: #64748b;">Dimensi (PxLxT)</span>
+                        <span style="font-size: 0.8rem; font-weight: 700; color: #1e293b;">5.5 x 2.1 x 2.1 M</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: #64748b;">Kapasitas Muat</span>
+                        <span style="font-size: 0.8rem; font-weight: 800; color: #2563eb;">5 - 6 Ton</span>
+                    </div>
+                    <div style="background: #f0fdf4; padding: 8px; border-radius: 6px; margin-top: 5px;">
+                        <span style="display: block; font-size: 0.7rem; font-weight: 700; color: #166534; margin-bottom: 4px;">MUATAN:</span>
+                        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                            <span style="background: white; border: 1px solid #86efac; color: #166534; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">KARTON BOX</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="truck-card" style="background: white; border-radius: 12px; border: 1px solid #cbd5e1; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <div class="truck-img-wrapper" style="position: relative; height: 160px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+                <span style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight:bold;">MAX 4 TON</span>
+                <img src="image/CDD-BOX.jpg" alt="CDD Box" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div class="truck-info-body" style="padding: 20px;">
+                <h3 class="truck-name" style="margin: 0 0 15px 0; font-size: 1.1rem; font-weight: 800; color: #0f172a;">CDD Box Standar</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: #64748b;">Dimensi (PxLxT)</span>
+                        <span style="font-size: 0.8rem; font-weight: 700; color: #1e293b;">4.2 x 2.0 x 1.9 M</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: #64748b;">Kapasitas Muat</span>
+                        <span style="font-size: 0.8rem; font-weight: 800; color: #2563eb;">4 - 4.5 Ton</span>
+                    </div>
+                    <div style="background: #f0fdf4; padding: 8px; border-radius: 6px; margin-top: 5px;">
+                        <span style="display: block; font-size: 0.7rem; font-weight: 700; color: #166534; margin-bottom: 4px;">MUATAN:</span>
+                        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                            <span style="background: white; border: 1px solid #86efac; color: #166534; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">KARTON BOX</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="truck-card" style="background: white; border-radius: 12px; border: 1px solid #cbd5e1; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <div class="truck-img-wrapper" style="position: relative; height: 160px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+                <span style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight:bold;">MAX 2.5 TON</span>
+                <img src="image/CDE -BOX.jpg" alt="CDE Box" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div class="truck-info-body" style="padding: 20px;">
+                <h3 class="truck-name" style="margin: 0 0 15px 0; font-size: 1.1rem; font-weight: 800; color: #0f172a;">CDE Engkel Box</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: #64748b;">Dimensi (PxLxT)</span>
+                        <span style="font-size: 0.8rem; font-weight: 700; color: #1e293b;">3.2 x 1.7 x 1.7 M</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: #64748b;">Kapasitas Muat</span>
+                        <span style="font-size: 0.8rem; font-weight: 800; color: #2563eb;">2 - 2.5 Ton</span>
+                    </div>
+                    <div style="background: #ecfeff; padding: 8px; border-radius: 6px; margin-top: 5px;">
+                        <span style="display: block; font-size: 0.7rem; font-weight: 700; color: #155e75; margin-bottom: 4px;">MUATAN:</span>
+                        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                            <span style="background: white; border: 1px solid #a5f3fc; color: #155e75; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">KARTON BOX</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="truck-card" style="background: white; border-radius: 12px; border: 1px solid #cbd5e1; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);">
+            <div class="truck-img-wrapper" style="position: relative; height: 160px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0;">
+                <span style="position: absolute; bottom: 12px; right: 12px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight:bold;">MAX 28 TON</span>
+                <img src="image/DUMP-TRUCK.jpg" alt="Dump Truck" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div class="truck-info-body" style="padding: 20px;">
+                <h3 class="truck-name" style="margin: 0 0 15px 0; font-size: 1.1rem; font-weight: 800; color: #0f172a;">Dump Truck</h3>
+                
+                <div style="display: flex; flex-direction: column; gap: 10px;">
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: #64748b;">Panjang Bak</span>
+                        <span style="font-size: 0.8rem; font-weight: 700; color: #1e293b;">6 - 8 Meter</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #cbd5e1; padding-bottom: 5px;">
+                        <span style="font-size: 0.8rem; color: #64748b;">Kapasitas Muat</span>
+                        <span style="font-size: 0.8rem; font-weight: 800; color: #2563eb;">24 - 28 Ton</span>
+                    </div>
+                    <div style="background: #fef2f2; padding: 8px; border-radius: 6px; margin-top: 5px;">
+                        <span style="display: block; font-size: 0.7rem; font-weight: 700; color: #991b1b; margin-bottom: 4px;">MUATAN:</span>
+                        <div style="display: flex; gap: 5px; flex-wrap: wrap;">
+                            <span style="background: white; border: 1px solid #fecaca; color: #991b1b; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;">BATU BARA / RAW MATERIAL</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        function filterTrucks() {
+            var input = document.getElementById('inputTruckSearch');
+            var filter = input.value.toUpperCase();
+            var grid = document.getElementById('truckGridContainer');
+            var cards = grid.getElementsByClassName('truck-card');
+            for (var i = 0; i < cards.length; i++) {
+                var title = cards[i].getElementsByClassName('truck-name')[0];
+                var specs = cards[i].innerText; 
+                if ((title.textContent + specs).toUpperCase().indexOf(filter) > -1) { 
+                    cards[i].style.display = ""; 
+                } else { 
+                    cards[i].style.display = "none"; 
+                }
+            }
+        }
+    </script>
+</div>
             <div id="page-route" class="page"><div class="card"><h3>📍 Route Planning Master</h3><p>Modul dalam pengembangan (Tersambung ke Firestore).</p></div></div>
             <div id="page-driver" class="page"><div class="card"><h3>👮 Driver Master Data</h3><p>Modul dalam pengembangan (Tersambung ke Firestore).</p></div></div>
             <div id="page-vehicle" class="page"><div class="card"><h3>🚛 Vehicle Master Data</h3><p>Modul dalam pengembangan (Tersambung ke Firestore).</p></div></div>
