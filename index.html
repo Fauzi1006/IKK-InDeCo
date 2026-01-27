@@ -821,6 +821,90 @@
 /* Agar tabel responsif di dalam box */
 .delay-box .table-responsive { border: none; margin: 0; }
 .delay-box th { background-color: #b91c1c !important; color: white !important; border-color: #991b1b !important; }
+/* --- CSS BARU UNTUK SOP & STANDAR --- */
+.section-box {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 25px;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.box-header {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #1e293b;
+    border-left: 5px solid #2563eb;
+    padding-left: 15px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+}
+
+/* Grid 6 Kolom untuk Equipment */
+.grid-6-col {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.item-card {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    text-align: center;
+    overflow: hidden;
+    background: white;
+    transition: transform 0.2s;
+}
+
+.item-card:hover { transform: translateY(-3px); border-color: #2563eb; }
+
+.placeholder-box {
+    height: 120px;
+    background: #f8fafc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.item-name {
+    padding: 10px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #334155;
+    text-transform: uppercase;
+}
+
+/* Style Tabel Item Check */
+.check-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.8rem;
+    color: #0f172a;
+    min-width: 800px;
+}
+
+.check-table th {
+    background-color: #1e293b;
+    color: white;
+    padding: 10px;
+    border: 1px solid #334155;
+    text-transform: uppercase;
+    font-weight: 700;
+    text-align: center;
+}
+
+.check-table td {
+    padding: 8px 10px;
+    border: 1px solid #cbd5e1;
+    vertical-align: middle;
+}
+
+.check-table tr:hover { background-color: #f1f5f9; }
+.text-center { text-align: center; }
+.text-bold { font-weight: 700; }
     </style>
 </head>
 <body class="sidebar-hidden">
@@ -927,10 +1011,10 @@
                 
                 <div class="menu-label">KNOWLEDGE BASE</div>
                 
-                <a onclick="showPage('page-sop', 'SOP & Standards')" class="nav-item" id="menu-sop" data-tooltip="SOP">
-                    <i class="fa-solid fa-clipboard-check"></i>
-                    <span>SOP & Standar</span>
-                </a>
+                <a onclick="showPage('sop', 'SOP')" class="nav-item" id="menu-sop" data-tooltip="SOP">
+    <i class="fa-solid fa-clipboard-check"></i>
+    <span>SOP & Standar</span>
+</a>
 
                 <a onclick="showPage('truck-types', 'Katalog Armada')" class="nav-item" id="menu-truck-types" data-tooltip="Jenis Truck">
     <i class="fa-solid fa-truck-ramp-box"></i>
@@ -1908,6 +1992,141 @@
         }
     </script>
 </div>
+<div id="page-sop" class="page">
+    
+    <div style="margin-bottom: 25px; border-bottom: 1px solid #e2e8f0; padding-bottom: 15px;">
+        <h2 style="margin: 0; color: #0f172a; font-size: 1.6rem; font-weight: 800;">
+            <i class="fa-solid fa-clipboard-check" style="color: #2563eb; margin-right: 10px;"></i>
+            Standar Perlengkapan
+        </h2>
+        <p style="color: #64748b; margin: 5px 0 0 0; font-size: 0.9rem;">
+            Panduan visual equipment dan tabel item check standar armada.
+        </p>
+    </div>
+
+    <div class="section-box">
+        <div class="box-header">
+            1. Point Equipment
+        </div>
+        
+        <div class="grid-6-col">
+            <div class="item-card">
+                <div class="placeholder-box" style="padding:0; height:120px;">
+                    <img src="image/SIKU TRACKBELT.jpeg" alt="Siku" style="width:100%; height:100%; object-fit:contain;">
+                </div>
+                <div class="item-name">SIKU TRACKBELT</div>
+            </div>
+
+            <div class="item-card">
+                <div class="placeholder-box" style="padding:0; height:120px;">
+                    <img src="image/FLOOR RUBBER.jpeg" alt="Floor" style="width:100%; height:100%; object-fit:contain;">
+                </div>
+                <div class="item-name">FLOOR RUBBER</div>
+            </div>
+
+            <div class="item-card">
+                <div class="placeholder-box" style="padding:0; height:120px;">
+                    <img src="image/STOPER BAN.jpeg" alt="Stoper" style="width:100%; height:100%; object-fit:contain;">
+                </div>
+                <div class="item-name">STOPER BAN</div>
+            </div>
+
+            <div class="item-card">
+                <div class="placeholder-box" style="padding:0; height:120px;">
+                    <img src="image/TRACKBELT.jpeg" alt="Trackbelt" style="width:100%; height:100%; object-fit:contain;">
+                </div>
+                <div class="item-name">TRACKBELT</div>
+            </div>
+
+            <div class="item-card">
+                <div class="placeholder-box" style="padding:0; height:120px;">
+                    <img src="image/SELONGSONG.jpeg" alt="Selongsong" style="width:100%; height:100%; object-fit:contain;">
+                </div>
+                <div class="item-name">SELONGSONG</div>
+            </div>
+
+            <div class="item-card">
+                <div class="placeholder-box" style="padding:0; height:120px;">
+                    <img src="image/TERPAL.jpeg" alt="Terpal" style="width:100%; height:100%; object-fit:contain;">
+                </div>
+                <div class="item-name">TERPAL</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-box">
+        <div class="box-header">
+            2. Tabel Standar Item Check
+        </div>
+
+        <div style="overflow-x: auto;">
+            <table class="check-table">
+                <thead>
+                    <tr>
+                        <th width="40">No</th>
+                        <th width="150">Jenis Truck</th>
+                        <th width="100">Area</th>
+                        <th>Jenis Perlengkapan</th>
+                        <th width="80">QTY</th>
+                        <th>Keterangan</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="5" class="text-center text-bold">1</td>
+                        <td rowspan="5" class="text-bold text-center">Tronton Lossbak</td>
+                        <td rowspan="5" class="text-center">ALL AREA</td>
+                        <td>Trackbelt</td>
+                        <td class="text-center text-bold">10</td>
+                        <td></td>
+                    </tr>
+                    <tr><td>Ganjal / Siku Kayu</td><td class="text-center text-bold">8</td><td></td></tr>
+                    <tr><td>Terpal</td><td class="text-center text-bold">4 Lapis</td><td>Min Terpal Biasa / Karet / Sheet Karton</td></tr>
+                    <tr><td>Alas Muatan</td><td class="text-center text-bold">4</td><td></td></tr>
+                    <tr><td>Sarung Plastik / Slongsong</td><td class="text-center">Sesuai Cust</td><td style="font-size:0.75rem;">Jika Tidak Membawa di Izinkan Tetap Muat dan di Pastikan Protektor Pengganti Aman</td></tr>
+
+                    <tr style="border-top: 2px solid #334155;">
+                        <td rowspan="5" class="text-center text-bold">2</td>
+                        <td rowspan="5" class="text-bold text-center">Tronton Wingbox</td>
+                        <td rowspan="5" class="text-center">ALL AREA</td>
+                        <td>Trackbelt</td>
+                        <td class="text-center text-bold">6</td>
+                        <td></td>
+                    </tr>
+                    <tr><td>Ganjal / Siku Kayu</td><td class="text-center text-bold">8</td><td></td></tr>
+                    <tr><td>Terpal</td><td class="text-center text-bold">1 Lapis</td><td>Min Terpal Biasa / Karet / Sheet Karton</td></tr>
+                    <tr><td>Alas Muatan</td><td class="text-center text-bold">4</td><td></td></tr>
+                    <tr><td>Sarung Plastik / Slongsong</td><td class="text-center">Sesuai Cust</td><td style="font-size:0.75rem;">Jika Tidak Membawa di Izinkan Tetap Muat dan di Pastikan Protektor Pengganti Aman</td></tr>
+
+                    <tr style="border-top: 2px solid #334155;">
+                        <td rowspan="5" class="text-center text-bold">3</td>
+                        <td rowspan="5" class="text-bold text-center">Trailer Lossbak</td>
+                        <td rowspan="5" class="text-center">ALL AREA</td>
+                        <td>Trackbelt</td>
+                        <td class="text-center text-bold">14</td>
+                        <td></td>
+                    </tr>
+                    <tr><td>Ganjal / Siku Kayu</td><td class="text-center text-bold">8</td><td></td></tr>
+                    <tr><td>Terpal</td><td class="text-center text-bold">4 Lapis</td><td>Min Terpal Biasa / Karet / Sheet Karton</td></tr>
+                    <tr><td>Alas Muatan</td><td class="text-center text-bold">4</td><td></td></tr>
+                    <tr><td>Sarung Plastik / Slongsong</td><td class="text-center">Sesuai Cust</td><td style="font-size:0.75rem;">Jika Tidak Membawa di Izinkan Tetap Muat dan di Pastikan Protektor Pengganti Aman</td></tr>
+
+                    <tr style="border-top: 2px solid #334155;">
+                        <td rowspan="5" class="text-center text-bold">4</td>
+                        <td rowspan="5" class="text-bold text-center">Trailer Wingbox</td>
+                        <td rowspan="5" class="text-center">ALL AREA</td>
+                        <td>Trackbelt</td>
+                        <td class="text-center text-bold">14</td>
+                        <td></td>
+                    </tr>
+                    <tr><td>Ganjal / Siku Kayu</td><td class="text-center text-bold">8</td><td></td></tr>
+                    <tr><td>Terpal</td><td class="text-center text-bold">1 Lapis</td><td>Min Terpal Biasa / Karet / Sheet Karton</td></tr>
+                    <tr><td>Alas Muatan</td><td class="text-center text-bold">4</td><td></td></tr>
+                    <tr><td>Sarung Plastik / Slongsong</td><td class="text-center">Sesuai Cust</td><td style="font-size:0.75rem;">Jika Tidak Membawa di Izinkan Tetap Muat dan di Pastikan Protektor Pengganti Aman</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
             <div id="page-route" class="page"><div class="card"><h3>📍 Route Planning Master</h3><p>Modul dalam pengembangan (Tersambung ke Firestore).</p></div></div>
             <div id="page-driver" class="page"><div class="card"><h3>👮 Driver Master Data</h3><p>Modul dalam pengembangan (Tersambung ke Firestore).</p></div></div>
             <div id="page-vehicle" class="page"><div class="card"><h3>🚛 Vehicle Master Data</h3><p>Modul dalam pengembangan (Tersambung ke Firestore).</p></div></div>
