@@ -1028,6 +1028,10 @@
     <i class="fa-solid fa-truck-ramp-box"></i>
     <span>Jenis Truck</span>
 </a>
+<a onclick="showPage('customer', 'Customer Master Data')" class="nav-item" id="menu-customer" data-tooltip="Customers">
+    <i class="fa-solid fa-building-user"></i>
+    <span>Customer</span>
+</a>
                 <div class="menu-label">MASTER DATA</div>
                 <a onclick="showPage('route', 'Route Master')" class="nav-item" id="menu-route" data-tooltip="Routes">
                     <i class="fa-solid fa-map-location-dot"></i>
@@ -1999,6 +2003,105 @@
             }
         }
     </script>
+</div>
+<div id="page-customer" class="page">
+    <div class="card">
+        <div style="border-bottom: 1px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 20px;">
+            <h3 style="margin:0; color:#1e293b; font-size: 1.25rem; font-weight: 800;">
+                <i class="fa-solid fa-building-user" style="color: #2563eb; margin-right: 10px;"></i>
+                PIC BONGKARAN ALL CUSTOMER DELIVERY LOKAL
+            </h3>
+            <p style="color:#64748b; margin:5px 0 0 0; font-size:0.9rem;">
+                Database alamat bongkar, PIC penerima, dan kontak lapangan.
+            </p>
+        </div>
+
+        <div class="analysis-control-bar" style="justify-content: space-between; background: #f8fafc; border: 1px solid #e2e8f0;">
+            <div style="display: flex; gap: 10px; flex: 1; max-width: 500px;">
+                <div style="position: relative; width: 100%;">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8;"></i>
+                    <input type="text" id="custSearchInput" onkeyup="filterCustomers()" placeholder="Cari Nama PT, Kota, atau Area..." 
+                           style="width: 100%; padding: 10px 10px 10px 35px; border: 1px solid #cbd5e1; border-radius: 6px;">
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="openAddCustomerModal()">
+                <i class="fa-solid fa-user-plus"></i> TAMBAH CUSTOMER
+            </button>
+        </div>
+
+        <div class="table-responsive" style="max-height: 600px; overflow-y: auto;">
+            <table class="main-data-table" id="table-customer">
+                <thead style="position: sticky; top: 0; z-index: 10;">
+                    <tr>
+                        <th style="width: 40px;">No</th>
+                        <th>Area</th>
+                        <th>Kota / Lokasi</th>
+                        <th>Nama Customer (PT)</th>
+                        <th>PIC Bongkaran</th>
+                        <th>No. Telepon / WA</th>
+                        <th style="width: 100px;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tbody-customer">
+                    </tbody>
+            </table>
+        </div>
+        
+        <div style="margin-top: 10px; font-size: 0.8rem; color: #64748b; text-align: right;">
+            Total Data: <span id="total-cust-count" style="font-weight: 800; color: #0f172a;">0</span>
+        </div>
+    </div>
+</div>
+
+<div class="modal-overlay" id="custModalOverlay">
+    <div class="modal-box">
+        <div class="modal-header" style="margin-bottom: 20px;">
+            <span style="font-weight: 700; font-size: 1.1rem; color: #1e293b;" id="custModalTitle">
+                <i class="fa-solid fa-user-pen"></i> Form Customer
+            </span>
+            <button class="btn-action" style="float: right; color:#64748b; background:none;" onclick="closeCustModal()">
+                <i class="fa-solid fa-xmark" style="font-size:1.2rem;"></i>
+            </button>
+        </div>
+        
+        <input type="hidden" id="cust-id"> <div style="display: grid; gap: 15px;">
+            <div>
+                <label>Nama Perusahaan (PT) *</label>
+                <input type="text" id="cust-name" placeholder="Contoh: PT. MAKMUR JAYA">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label>Area</label>
+                    <select id="cust-area" style="width:100%; padding:8px; border:1px solid #cbd5e1; border-radius:6px;">
+                        <option value="JABODETABEK">JABODETABEK</option>
+                        <option value="JAWA TENGAH">JAWA TENGAH</option>
+                        <option value="JAWA TIMUR">JAWA TIMUR</option>
+                        <option value="LUAR PULAU">LUAR PULAU</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Kota</label>
+                    <input type="text" id="cust-city" placeholder="Contoh: BEKASI">
+                </div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label>Nama PIC</label>
+                    <input type="text" id="cust-pic" placeholder="-">
+                </div>
+                <div>
+                    <label>No. Telepon</label>
+                    <input type="text" id="cust-phone" placeholder="-">
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-top: 25px; text-align: right; display: flex; gap: 10px; justify-content: flex-end;">
+            <button class="btn btn-white" onclick="closeCustModal()">Batal</button>
+            <button class="btn btn-primary" onclick="saveCustomerData()">SIMPAN</button>
+        </div>
+    </div>
 </div>
 <div id="page-sop" class="page">
     
@@ -4164,6 +4267,196 @@ function editHistoryItem(id) {
                 plugins: [ChartDataLabels]
             });
         }
+        // --- LOGIC CUSTOMER MASTER DATA ---
+
+// 1. DATABASE SEMENTARA (Array) - Diambil dari data yang Anda berikan
+let customerDB = [
+    { id: 1, area: "JABODETABEK", city: "BANDUNG", name: "PT. GLOBAL PAPYRUS SEMESTA", pic: "-", phone: "-" },
+    { id: 2, area: "JABODETABEK", city: "BANDUNG", name: "PT. APP PURINUSA EKAPERSADA", pic: "-", phone: "-" },
+    { id: 3, area: "JABODETABEK", city: "BEKASI", name: "PT SENTRALINDO TEGUH GEMILANG", pic: "-", phone: "-" },
+    { id: 4, area: "JABODETABEK", city: "BEKASI", name: "PT. KATI KARTIKA MURNI", pic: "-", phone: "-" },
+    { id: 5, area: "JABODETABEK", city: "BOGOR", name: "PT. PARAMITRA GUNAKARYA CEMERLANG", pic: "-", phone: "-" },
+    { id: 6, area: "JABODETABEK", city: "CIBITUNG", name: "PT. DONGJU RAYA INDONESIA", pic: "-", phone: "-" },
+    { id: 7, area: "JABODETABEK", city: "CIKARANG", name: "PT MALINDO IRFAN", pic: "-", phone: "-" },
+    { id: 8, area: "JABODETABEK", city: "CIKARANG", name: "PT OJI SINAR MAS PACKAGING", pic: "-", phone: "-" },
+    { id: 9, area: "JABODETABEK", city: "CIKARANG", name: "SENTRALINDO TEGUH GEMILANG, PT (GD)", pic: "-", phone: "-" },
+    { id: 10, area: "JABODETABEK", city: "KARAWANG", name: "PT. DAYACIPTA KEMASINDO (GD)", pic: "-", phone: "-" },
+    { id: 11, area: "JABODETABEK", city: "PURWAKARTA", name: "PT. APP PURINUSA EKAPERSADA", pic: "-", phone: "-" },
+    { id: 12, area: "JABODETABEK", city: "SERANG", name: "PT. EKA KEMASINDO ASRI", pic: "-", phone: "-" },
+    { id: 13, area: "JABODETABEK", city: "TANGERANG", name: "MULTI ARTHA ABADI, PT", pic: "-", phone: "-" },
+    { id: 14, area: "JABODETABEK", city: "TANGERANG", name: "MULTIBOX INDAH, PT", pic: "-", phone: "-" },
+    { id: 15, area: "JABODETABEK", city: "TANGERANG", name: "PT DAYACIPTA KEMASINDO", pic: "-", phone: "-" },
+    { id: 16, area: "JABODETABEK", city: "TANGERANG", name: "PT PANCAMITRA PACKINDO", pic: "-", phone: "-" },
+    { id: 17, area: "JABODETABEK", city: "TANGERANG", name: "PT. ADINA MULTI WAHANA", pic: "-", phone: "-" },
+    { id: 18, area: "JABODETABEK", city: "TANGERANG", name: "PT. CARTONINDUS SUMBERJAYA", pic: "-", phone: "-" },
+    { id: 19, area: "JABODETABEK", city: "TANGERANG", name: "PT. KATI KARTIKA MURNI", pic: "-", phone: "-" },
+    { id: 20, area: "JABODETABEK", city: "TANGERANG", name: "PT. SETIAJAYA KEMASINDO MADYA", pic: "-", phone: "-" },
+    { id: 21, area: "JABODETABEK", city: "TANGERANG", name: "PT. SATYAMITRA KEMAS LESTARI TBK", pic: "-", phone: "-" },
+    { id: 22, area: "JAWA TENGAH", city: "DEMAK", name: "PT. APP PURINUSA EKAPERSADA", pic: "-", phone: "-" },
+    { id: 23, area: "JAWA TENGAH", city: "KENDAL", name: "PT. KARYA WANGSA INVESTAMA", pic: "FANISA", phone: "0821-4348-4066" },
+    { id: 24, area: "JAWA TENGAH", city: "KUDUS", name: "PT. JAWASURYA KENCANAINDAH", pic: "-", phone: "0878-3281-8575" },
+    { id: 25, area: "JAWA TENGAH", city: "SEMARANG", name: "PT. GLOBAL PAPYRUS SEMESTA", pic: "-", phone: "-" },
+    { id: 26, area: "JAWA TENGAH", city: "SEMARANG", name: "PT. DEVARSH SUKSES FOREVER", pic: "-", phone: "-" },
+    { id: 27, area: "JAWA TENGAH", city: "SEMARANG", name: "PT. JAWASURYA KENCANAINDAH", pic: "-", phone: "-" },
+    { id: 28, area: "JAWA TENGAH", city: "SEMARANG", name: "PT. APP PURINUSA EKAPERSADA", pic: "-", phone: "-" },
+    { id: 29, area: "JAWA TIMUR", city: "GRESIK", name: "PT SINAR GARUDA MAKMURINDO", pic: "-", phone: "-" },
+    { id: 30, area: "JAWA TIMUR", city: "GRESIK", name: "PT. ANUGRAH ANEKABOX", pic: "-", phone: "-" },
+    { id: 31, area: "JAWA TIMUR", city: "GRESIK", name: "PT. MULIA GRAND MANUFACTURE", pic: "ANING YULIA", phone: "0857-0767-7249" },
+    { id: 32, area: "JAWA TIMUR", city: "GRESIK", name: "PT. SURINDO TEGUH GEMILANG", pic: "-", phone: "-" },
+    { id: 33, area: "JAWA TIMUR", city: "GRESIK", name: "SURINDO TEGUH GEMILANG, PT (GD)", pic: "-", phone: "-" },
+    { id: 34, area: "JAWA TIMUR", city: "KEDIRI", name: "PT. JAWASURYA KENCANA INDAH", pic: "ANDIS", phone: "0857-3513-1055" },
+    { id: 35, area: "JAWA TIMUR", city: "MOJOKERTO", name: "PT. CAKRAWALA CEMERLANG BOX", pic: "-", phone: "-" },
+    { id: 36, area: "JAWA TIMUR", city: "MOJOKERTO", name: "PT. SENTRAL KEMASINDO TEGUH", pic: "-", phone: "-" },
+    { id: 37, area: "JAWA TIMUR", city: "MOJOKERTO", name: "SUPRACOR SEJAHTERA, PT (GD)", pic: "-", phone: "-" },
+    { id: 38, area: "JAWA TIMUR", city: "PASURUAN", name: "PT UNIVERSAL JASA KEMAS", pic: "-", phone: "-" },
+    { id: 39, area: "JAWA TIMUR", city: "PASURUAN", name: "PT. UNIVERSAL JASA KEMAS (GD)", pic: "-", phone: "-" },
+    { id: 40, area: "JAWA TIMUR", city: "SIDOARJO", name: "PT PABRIK KERTAS TJIWI KIMIA", pic: "-", phone: "-" },
+    { id: 41, area: "JAWA TIMUR", city: "SIDOARJO", name: "PT. GLOBAL PAPYRUS SEMESTA", pic: "-", phone: "-" },
+    { id: 42, area: "JAWA TIMUR", city: "SIDOARJO", name: "PT. QINGDA MASPION PAPER PRODUCTS", pic: "-", phone: "-" },
+    { id: 43, area: "JAWA TIMUR", city: "SURABAYA", name: "PRIMABOX ADIPERKASA, PT", pic: "-", phone: "-" },
+    { id: 44, area: "JAWA TIMUR", city: "SURABAYA", name: "PT. KEDAWUNG SETIA CORRUGATED", pic: "-", phone: "-" },
+    { id: 45, area: "LUAR PULAU", city: "BATAM", name: "PT. ASIA PAPERINDO PERKASA", pic: "-", phone: "-" },
+    { id: 46, area: "LUAR PULAU", city: "DELI", name: "KREASI KOTAKMEGAH, PT (GD)", pic: "-", phone: "-" },
+    { id: 47, area: "LUAR PULAU", city: "LAMPUNG", name: "PT KONVERTA MITRA ABADI", pic: "-", phone: "-" },
+    { id: 48, area: "LUAR PULAU", city: "MEDAN", name: "PT. KREASI KOTAKMEGAH", pic: "-", phone: "-" }
+];
+
+// 2. FUNGSI RENDER TABEL
+function renderCustomerTable(data = customerDB) {
+    const tbody = document.getElementById('tbody-customer');
+    const countSpan = document.getElementById('total-cust-count');
+    
+    if(!tbody) return;
+
+    tbody.innerHTML = "";
+    countSpan.innerText = data.length;
+
+    if (data.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:20px; color:#94a3b8;">Tidak ada data ditemukan.</td></tr>`;
+        return;
+    }
+
+    data.forEach((item, index) => {
+        // Highlight jika ada PIC/Telp
+        const picStyle = (item.pic !== "-") ? "color:#0f172a; font-weight:700;" : "color:#94a3b8;";
+        const phoneStyle = (item.phone !== "-") ? "color:#2563eb; font-weight:700;" : "color:#94a3b8;";
+
+        const row = `
+            <tr>
+                <td style="text-align:center;">${index + 1}</td>
+                <td>${item.area}</td>
+                <td>${item.city}</td>
+                <td style="font-weight:600; color:#1e293b;">${item.name}</td>
+                <td style="${picStyle}">${item.pic}</td>
+                <td style="${phoneStyle}">${item.phone}</td>
+                <td style="text-align:center;">
+                    <button class="btn-action edit" onclick="editCustomer(${item.id})" title="Edit" style="background:#f59e0b; width:28px; height:28px;">
+                        <i class="fa-solid fa-pen"></i>
+                    </button>
+                    <button class="btn-action delete" onclick="deleteCustomer(${item.id})" title="Hapus" style="background:#ef4444; width:28px; height:28px; margin-left:5px;">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+        tbody.innerHTML += row;
+    });
+}
+
+// 3. FUNGSI SEARCH
+function filterCustomers() {
+    const input = document.getElementById('custSearchInput').value.toUpperCase();
+    const filtered = customerDB.filter(c => 
+        c.name.toUpperCase().includes(input) || 
+        c.city.toUpperCase().includes(input) ||
+        c.area.toUpperCase().includes(input)
+    );
+    renderCustomerTable(filtered);
+}
+
+// 4. FUNGSI MODAL & CRUD
+function openAddCustomerModal() {
+    document.getElementById('custModalTitle').innerHTML = '<i class="fa-solid fa-user-plus"></i> Tambah Customer Baru';
+    document.getElementById('cust-id').value = ""; // Kosongkan ID (Mode Tambah)
+    
+    // Reset Form
+    document.getElementById('cust-name').value = "";
+    document.getElementById('cust-city').value = "";
+    document.getElementById('cust-pic').value = "";
+    document.getElementById('cust-phone').value = "";
+    
+    document.getElementById('custModalOverlay').classList.add('active');
+}
+
+function editCustomer(id) {
+    const cust = customerDB.find(c => c.id === id);
+    if (!cust) return;
+
+    document.getElementById('custModalTitle').innerHTML = '<i class="fa-solid fa-user-pen"></i> Edit Customer';
+    document.getElementById('cust-id').value = cust.id;
+    
+    document.getElementById('cust-name').value = cust.name;
+    document.getElementById('cust-area').value = cust.area;
+    document.getElementById('cust-city').value = cust.city;
+    document.getElementById('cust-pic').value = (cust.pic === '-') ? '' : cust.pic;
+    document.getElementById('cust-phone').value = (cust.phone === '-') ? '' : cust.phone;
+
+    document.getElementById('custModalOverlay').classList.add('active');
+}
+
+function closeCustModal() {
+    document.getElementById('custModalOverlay').classList.remove('active');
+}
+
+function saveCustomerData() {
+    const id = document.getElementById('cust-id').value;
+    const name = document.getElementById('cust-name').value.trim();
+    const area = document.getElementById('cust-area').value;
+    const city = document.getElementById('cust-city').value.trim();
+    let pic = document.getElementById('cust-pic').value.trim();
+    let phone = document.getElementById('cust-phone').value.trim();
+
+    if (!name || !city) {
+        alert("Nama PT dan Kota wajib diisi!");
+        return;
+    }
+
+    if (pic === "") pic = "-";
+    if (phone === "") phone = "-";
+
+    if (id) {
+        // --- MODE EDIT ---
+        const index = customerDB.findIndex(c => c.id == id);
+        if (index !== -1) {
+            customerDB[index] = { id: parseInt(id), area, city, name, pic, phone };
+            alert("Data berhasil diperbarui!");
+        }
+    } else {
+        // --- MODE TAMBAH ---
+        const newId = customerDB.length > 0 ? Math.max(...customerDB.map(c => c.id)) + 1 : 1;
+        customerDB.push({ id: newId, area, city, name, pic, phone });
+        alert("Customer baru berhasil ditambahkan!");
+    }
+
+    closeCustModal();
+    renderCustomerTable(); // Refresh tabel
+    
+    // Optional: Simpan ke LocalStorage agar tidak hilang saat refresh (sementara)
+    // localStorage.setItem('indeco_customers', JSON.stringify(customerDB));
+}
+
+function deleteCustomer(id) {
+    if(confirm("Yakin ingin menghapus customer ini?")) {
+        customerDB = customerDB.filter(c => c.id !== id);
+        renderCustomerTable();
+    }
+}
+
+// Render awal saat halaman dimuat
+// (Tambahkan ini di fungsi initAppData atau di paling bawah script)
+document.addEventListener("DOMContentLoaded", () => {
+    renderCustomerTable();
+});
     </script>
 </body>
 </html>
