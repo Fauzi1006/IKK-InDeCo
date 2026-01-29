@@ -2069,10 +2069,6 @@
             </table>
         </div>
         
-        <div style="margin-top: 10px; font-size: 0.8rem; color: #64748b; text-align: right;">
-            Total Data: <span id="total-cust-count" style="font-weight: 800; color: #0f172a;">0</span>
-        </div>
-
         <div style="margin-top: 40px; background: #f8fafc; padding: 25px; border-radius: 12px; border: 1px solid #e2e8f0;">
             <div style="margin-bottom: 25px; border-bottom: 2px solid #cbd5e1; padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
                 <h3 style="margin:0; color:#1e293b; font-size: 1.1rem; font-weight: 800;">
@@ -2083,14 +2079,24 @@
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 30px;">
+                
                 <div style="background: white; border-radius: 8px; overflow: hidden; border: 1px solid #bfdbfe; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                    <div style="background: #1e40af; color: white; padding: 10px 20px; font-weight: 700; font-size: 0.95rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="background: #1e40af; color: white; padding: 10px 20px; font-weight: 700; font-size: 0.95rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <span><i class="fa-solid fa-building"></i> CUSTOMER CMI</span>
                             <span id="badge-cmi" style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">0</span>
                         </div>
-                        <button onclick="openAddCustomerModal('CMI')" style="background: white; color: #1e40af; border: none; padding: 5px 12px; border-radius: 4px; font-size: 0.75rem; font-weight: 800; cursor: pointer;"><i class="fa-solid fa-plus"></i> TAMBAH CMI</button>
+
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="text" id="search-cmi" onkeyup="renderSalesGroupTables()" placeholder="Cari Customer CMI..." 
+                                   style="padding: 5px 10px; border-radius: 4px; border: none; font-size: 0.8rem; color: #1e3a8a; width: 200px;">
+                            <button onclick="openAddCustomerModal('CMI')" style="background: white; color: #1e40af; border: none; padding: 5px 12px; border-radius: 4px; font-size: 0.75rem; font-weight: 800; cursor: pointer;">
+                                <i class="fa-solid fa-plus"></i> TAMBAH
+                            </button>
+                        </div>
                     </div>
+
                     <div class="table-responsive" style="max-height: 400px; overflow-y: auto; margin:0; border:none;">
                         <table class="main-data-table" style="font-size: 0.8rem; border: none;">
                             <thead style="position: sticky; top: 0; z-index: 5;">
@@ -2109,13 +2115,22 @@
                 </div>
 
                 <div style="background: white; border-radius: 8px; overflow: hidden; border: 1px solid #fed7aa; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
-                    <div style="background: #c2410c; color: white; padding: 10px 20px; font-weight: 700; font-size: 0.95rem; display: flex; justify-content: space-between; align-items: center;">
+                    <div style="background: #c2410c; color: white; padding: 10px 20px; font-weight: 700; font-size: 0.95rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                        
                         <div style="display: flex; align-items: center; gap: 10px;">
                             <span><i class="fa-solid fa-briefcase"></i> CUSTOMER BU17</span>
                             <span id="badge-bu17" style="background: rgba(255,255,255,0.2); padding: 2px 8px; border-radius: 4px; font-size: 0.75rem;">0</span>
                         </div>
-                        <button onclick="openAddCustomerModal('BU17')" style="background: white; color: #c2410c; border: none; padding: 5px 12px; border-radius: 4px; font-size: 0.75rem; font-weight: 800; cursor: pointer;"><i class="fa-solid fa-plus"></i> TAMBAH BU17</button>
+
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <input type="text" id="search-bu17" onkeyup="renderSalesGroupTables()" placeholder="Cari Customer BU17..." 
+                                   style="padding: 5px 10px; border-radius: 4px; border: none; font-size: 0.8rem; color: #9a3412; width: 200px;">
+                            <button onclick="openAddCustomerModal('BU17')" style="background: white; color: #c2410c; border: none; padding: 5px 12px; border-radius: 4px; font-size: 0.75rem; font-weight: 800; cursor: pointer;">
+                                <i class="fa-solid fa-plus"></i> TAMBAH
+                            </button>
+                        </div>
                     </div>
+
                     <div class="table-responsive" style="max-height: 400px; overflow-y: auto; margin:0; border:none;">
                         <table class="main-data-table" style="font-size: 0.8rem; border: none;">
                             <thead style="position: sticky; top: 0; z-index: 5;">
@@ -2132,9 +2147,49 @@
                         </table>
                     </div>
                 </div>
+
             </div>
         </div>
 
+    </div>
+</div>
+
+<div id="page-route" class="page">
+    <div class="card" style="min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+        <div style="background: #eff6ff; width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+            <i class="fa-solid fa-map-location-dot" style="font-size: 3rem; color: #2563eb;"></i>
+        </div>
+        <h2 style="color: #1e293b; font-weight: 800; margin-bottom: 10px;">MENU INI MASIH DALAM PENGEMBANGAN</h2>
+        <p style="color: #64748b; max-width: 400px;">Modul <b>Route Master</b> sedang disiapkan.</p>
+        <div style="margin-top: 30px; padding: 10px 20px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; color: #94a3b8; font-size: 0.85rem;">
+            <i class="fa-solid fa-code"></i> Status: Coding in Progress...
+        </div>
+    </div>
+</div>
+
+<div id="page-driver" class="page">
+    <div class="card" style="min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+        <div style="background: #fff7ed; width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+            <i class="fa-solid fa-id-card" style="font-size: 3rem; color: #ea580c;"></i>
+        </div>
+        <h2 style="color: #1e293b; font-weight: 800; margin-bottom: 10px;">MENU INI MASIH DALAM PENGEMBANGAN</h2>
+        <p style="color: #64748b; max-width: 400px;">Modul <b>Driver Master</b> sedang disiapkan.</p>
+        <div style="margin-top: 30px; padding: 10px 20px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; color: #94a3b8; font-size: 0.85rem;">
+            <i class="fa-solid fa-code"></i> Status: Coding in Progress...
+        </div>
+    </div>
+</div>
+
+<div id="page-vehicle" class="page">
+    <div class="card" style="min-height: 500px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;">
+        <div style="background: #f0fdf4; width: 100px; height: 100px; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+            <i class="fa-solid fa-truck-front" style="font-size: 3rem; color: #16a34a;"></i>
+        </div>
+        <h2 style="color: #1e293b; font-weight: 800; margin-bottom: 10px;">MENU INI MASIH DALAM PENGEMBANGAN</h2>
+        <p style="color: #64748b; max-width: 400px;">Modul <b>Vehicle Master</b> sedang disiapkan.</p>
+        <div style="margin-top: 30px; padding: 10px 20px; background: #f8fafc; border: 1px dashed #cbd5e1; border-radius: 6px; color: #94a3b8; font-size: 0.85rem;">
+            <i class="fa-solid fa-code"></i> Status: Coding in Progress...
+        </div>
     </div>
 </div>
 
@@ -2230,79 +2285,226 @@
         </div>
     </div>
 
-    <div class="section-box">
-        <div class="box-header">
-            2. Tabel Standar Item Check
-        </div>
+    <style>
+    /* Styling Sederhana */
+    .section-box {
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        border: 1px solid #e2e8f0;
+        margin-bottom: 20px;
+    }
+    .box-header {
+        background: #f1f5f9;
+        padding: 15px;
+        font-weight: 700;
+        color: #1e293b;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    .check-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.85rem;
+    }
+    .check-table th {
+        background: #1e293b;
+        color: white;
+        padding: 10px;
+        text-align: left;
+    }
+    .check-table td {
+        padding: 8px;
+        border-bottom: 1px solid #e2e8f0;
+        border-right: 1px solid #e2e8f0;
+        vertical-align: middle;
+    }
+    .text-center { text-align: center; }
+    .text-bold { font-weight: 700; }
+    
+    /* Tombol Aksi */
+    .btn-action {
+        border: none;
+        padding: 6px 12px;
+        border-radius: 4px;
+        cursor: pointer;
+        color: white;
+        font-size: 0.9rem;
+        margin: 2px;
+        transition: 0.2s;
+    }
+    .btn-edit { background-color: #f59e0b; }
+    .btn-save { background-color: #10b981; }
+    .btn-delete { background-color: #ef4444; }
 
-        <div style="overflow-x: auto;">
-            <table class="check-table">
-                <thead>
-                    <tr>
-                        <th width="40">No</th>
-                        <th width="150">Jenis Truck</th>
-                        <th width="100">Area</th>
-                        <th>Jenis Perlengkapan</th>
-                        <th width="80">QTY</th>
-                        <th>Keterangan</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td rowspan="5" class="text-center text-bold">1</td>
-                        <td rowspan="5" class="text-bold text-center">Tronton Lossbak</td>
-                        <td rowspan="5" class="text-center">ALL AREA</td>
-                        <td>Trackbelt</td>
-                        <td class="text-center text-bold">10</td>
-                        <td></td>
-                    </tr>
-                    <tr><td>Ganjal / Siku Kayu</td><td class="text-center text-bold">8</td><td></td></tr>
-                    <tr><td>Terpal</td><td class="text-center text-bold">4 Lapis</td><td>Min Terpal Biasa / Karet / Sheet Karton</td></tr>
-                    <tr><td>Alas Muatan</td><td class="text-center text-bold">4</td><td></td></tr>
-                    <tr><td>Sarung Plastik / Slongsong</td><td class="text-center">Sesuai Cust</td><td style="font-size:0.75rem;">Jika Tidak Membawa di Izinkan Tetap Muat dan di Pastikan Protektor Pengganti Aman</td></tr>
+    /* Input Mode Edit */
+    .input-edit {
+        width: 100%;
+        padding: 5px;
+        border: 1px solid #3b82f6;
+        border-radius: 4px;
+        background: #eff6ff;
+        font-size: 0.8rem;
+    }
+    
+    /* Batas antar group truck agar lebih jelas */
+    tbody {
+        border-bottom: 3px solid #cbd5e1;
+    }
+</style>
 
-                    <tr style="border-top: 2px solid #334155;">
-                        <td rowspan="5" class="text-center text-bold">2</td>
-                        <td rowspan="5" class="text-bold text-center">Tronton Wingbox</td>
-                        <td rowspan="5" class="text-center">ALL AREA</td>
-                        <td>Trackbelt</td>
-                        <td class="text-center text-bold">6</td>
-                        <td></td>
-                    </tr>
-                    <tr><td>Ganjal / Siku Kayu</td><td class="text-center text-bold">8</td><td></td></tr>
-                    <tr><td>Terpal</td><td class="text-center text-bold">1 Lapis</td><td>Min Terpal Biasa / Karet / Sheet Karton</td></tr>
-                    <tr><td>Alas Muatan</td><td class="text-center text-bold">4</td><td></td></tr>
-                    <tr><td>Sarung Plastik / Slongsong</td><td class="text-center">Sesuai Cust</td><td style="font-size:0.75rem;">Jika Tidak Membawa di Izinkan Tetap Muat dan di Pastikan Protektor Pengganti Aman</td></tr>
-
-                    <tr style="border-top: 2px solid #334155;">
-                        <td rowspan="5" class="text-center text-bold">3</td>
-                        <td rowspan="5" class="text-bold text-center">Trailer Lossbak</td>
-                        <td rowspan="5" class="text-center">ALL AREA</td>
-                        <td>Trackbelt</td>
-                        <td class="text-center text-bold">14</td>
-                        <td></td>
-                    </tr>
-                    <tr><td>Ganjal / Siku Kayu</td><td class="text-center text-bold">8</td><td></td></tr>
-                    <tr><td>Terpal</td><td class="text-center text-bold">4 Lapis</td><td>Min Terpal Biasa / Karet / Sheet Karton</td></tr>
-                    <tr><td>Alas Muatan</td><td class="text-center text-bold">4</td><td></td></tr>
-                    <tr><td>Sarung Plastik / Slongsong</td><td class="text-center">Sesuai Cust</td><td style="font-size:0.75rem;">Jika Tidak Membawa di Izinkan Tetap Muat dan di Pastikan Protektor Pengganti Aman</td></tr>
-
-                    <tr style="border-top: 2px solid #334155;">
-                        <td rowspan="5" class="text-center text-bold">4</td>
-                        <td rowspan="5" class="text-bold text-center">Trailer Wingbox</td>
-                        <td rowspan="5" class="text-center">ALL AREA</td>
-                        <td>Trackbelt</td>
-                        <td class="text-center text-bold">14</td>
-                        <td></td>
-                    </tr>
-                    <tr><td>Ganjal / Siku Kayu</td><td class="text-center text-bold">8</td><td></td></tr>
-                    <tr><td>Terpal</td><td class="text-center text-bold">1 Lapis</td><td>Min Terpal Biasa / Karet / Sheet Karton</td></tr>
-                    <tr><td>Alas Muatan</td><td class="text-center text-bold">4</td><td></td></tr>
-                    <tr><td>Sarung Plastik / Slongsong</td><td class="text-center">Sesuai Cust</td><td style="font-size:0.75rem;">Jika Tidak Membawa di Izinkan Tetap Muat dan di Pastikan Protektor Pengganti Aman</td></tr>
-                </tbody>
-            </table>
-        </div>
+<div class="section-box">
+    <div class="box-header">
+        2. Tabel Standar Item Check (Master Data)
     </div>
+
+    <div style="overflow-x: auto;">
+        <table class="check-table">
+            <thead>
+                <tr>
+                    <th class="text-center" width="40">No</th>
+                    <th width="150">Jenis Truck</th>
+                    <th width="100">Area</th>
+                    <th>Jenis Perlengkapan</th>
+                    <th width="80" class="text-center">QTY</th>
+                    <th>Keterangan</th>
+                    <th width="100" class="text-center">Aksi Group</th>
+                </tr>
+            </thead>
+            
+            <tbody id="group-tronton-lossbak">
+                <tr>
+                    <td rowspan="5" class="text-center text-bold">1</td>
+                    <td rowspan="5" class="text-bold text-center editable">Tronton Lossbak</td>
+                    <td rowspan="5" class="text-center editable">ALL AREA</td>
+                    <td class="editable">Trackbelt</td>
+                    <td class="text-center text-bold editable">10</td>
+                    <td class="editable"></td>
+                    <td rowspan="5" class="text-center" style="background: #f8fafc;">
+                        <button class="btn-action btn-edit" onclick="toggleEditGroup(this)" title="Edit Semua Item"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="btn-action btn-delete" onclick="deleteGroup(this)" title="Hapus Truck Ini"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+                <tr><td class="editable">Ganjal / Siku Kayu</td><td class="text-center text-bold editable">8</td><td class="editable"></td></tr>
+                <tr><td class="editable">Terpal</td><td class="text-center text-bold editable">4 Lapis</td><td class="editable">Min Terpal Biasa / Karet / Sheet Karton</td></tr>
+                <tr><td class="editable">Alas Muatan</td><td class="text-center text-bold editable">4</td><td class="editable"></td></tr>
+                <tr><td class="editable">Sarung Plastik / Slongsong</td><td class="text-center editable">Sesuai Cust</td><td class="editable" style="font-size:0.75rem;">Jika tidak bawa, pastikan protektor aman</td></tr>
+            </tbody>
+
+            <tbody id="group-tronton-wingbox">
+                <tr>
+                    <td rowspan="5" class="text-center text-bold">2</td>
+                    <td rowspan="5" class="text-bold text-center editable">Tronton Wingbox</td>
+                    <td rowspan="5" class="text-center editable">ALL AREA</td>
+                    <td class="editable">Trackbelt</td>
+                    <td class="text-center text-bold editable">6</td>
+                    <td class="editable"></td>
+                    <td rowspan="5" class="text-center" style="background: #f8fafc;">
+                        <button class="btn-action btn-edit" onclick="toggleEditGroup(this)"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="btn-action btn-delete" onclick="deleteGroup(this)"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+                <tr><td class="editable">Ganjal / Siku Kayu</td><td class="text-center text-bold editable">8</td><td class="editable"></td></tr>
+                <tr><td class="editable">Terpal</td><td class="text-center text-bold editable">1 Lapis</td><td class="editable">Min Terpal Biasa / Karet / Sheet Karton</td></tr>
+                <tr><td class="editable">Alas Muatan</td><td class="text-center text-bold editable">4</td><td class="editable"></td></tr>
+                <tr><td class="editable">Sarung Plastik / Slongsong</td><td class="text-center editable">Sesuai Cust</td><td class="editable" style="font-size:0.75rem;">Jika tidak bawa, pastikan protektor aman</td></tr>
+            </tbody>
+
+            <tbody id="group-trailer-lossbak">
+                <tr>
+                    <td rowspan="5" class="text-center text-bold">3</td>
+                    <td rowspan="5" class="text-bold text-center editable">Trailer Lossbak</td>
+                    <td rowspan="5" class="text-center editable">ALL AREA</td>
+                    <td class="editable">Trackbelt</td>
+                    <td class="text-center text-bold editable">14</td>
+                    <td class="editable"></td>
+                    <td rowspan="5" class="text-center" style="background: #f8fafc;">
+                        <button class="btn-action btn-edit" onclick="toggleEditGroup(this)"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="btn-action btn-delete" onclick="deleteGroup(this)"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+                <tr><td class="editable">Ganjal / Siku Kayu</td><td class="text-center text-bold editable">8</td><td class="editable"></td></tr>
+                <tr><td class="editable">Terpal</td><td class="text-center text-bold editable">4 Lapis</td><td class="editable">Min Terpal Biasa / Karet / Sheet Karton</td></tr>
+                <tr><td class="editable">Alas Muatan</td><td class="text-center text-bold editable">4</td><td class="editable"></td></tr>
+                <tr><td class="editable">Sarung Plastik / Slongsong</td><td class="text-center editable">Sesuai Cust</td><td class="editable" style="font-size:0.75rem;">Jika tidak bawa, pastikan protektor aman</td></tr>
+            </tbody>
+
+            <tbody id="group-trailer-wingbox">
+                <tr>
+                    <td rowspan="5" class="text-center text-bold">4</td>
+                    <td rowspan="5" class="text-bold text-center editable">Trailer Wingbox</td>
+                    <td rowspan="5" class="text-center editable">ALL AREA</td>
+                    <td class="editable">Trackbelt</td>
+                    <td class="text-center text-bold editable">14</td>
+                    <td class="editable"></td>
+                    <td rowspan="5" class="text-center" style="background: #f8fafc;">
+                        <button class="btn-action btn-edit" onclick="toggleEditGroup(this)"><i class="fa-solid fa-pen-to-square"></i></button>
+                        <button class="btn-action btn-delete" onclick="deleteGroup(this)"><i class="fa-solid fa-trash"></i></button>
+                    </td>
+                </tr>
+                <tr><td class="editable">Ganjal / Siku Kayu</td><td class="text-center text-bold editable">8</td><td class="editable"></td></tr>
+                <tr><td class="editable">Terpal</td><td class="text-center text-bold editable">1 Lapis</td><td class="editable">Min Terpal Biasa / Karet / Sheet Karton</td></tr>
+                <tr><td class="editable">Alas Muatan</td><td class="text-center text-bold editable">4</td><td class="editable"></td></tr>
+                <tr><td class="editable">Sarung Plastik / Slongsong</td><td class="text-center editable">Sesuai Cust</td><td class="editable" style="font-size:0.75rem;">Jika tidak bawa, pastikan protektor aman</td></tr>
+            </tbody>
+
+        </table>
+    </div>
+</div>
+
+<script>
+    // Fungsi untuk mengubah 1 Group TBODY menjadi Mode Edit
+    function toggleEditGroup(button) {
+        // Cari elemen TBODY induk tempat tombol berada
+        // Struktur: Button -> TD -> TR -> TBODY
+        const tbody = button.closest('tbody'); 
+        
+        // Cek apakah tombol sedang mode 'Edit' (Kuning) atau 'Save' (Hijau)
+        if (button.classList.contains('btn-edit')) {
+            // === MODE EDIT (Ubah Text jadi Input) ===
+            
+            // Cari semua cell dengan class 'editable' di dalam tbody ini
+            const editableCells = tbody.querySelectorAll('.editable');
+            
+            editableCells.forEach(cell => {
+                const currentText = cell.innerText;
+                // Ganti text dengan input box
+                cell.innerHTML = `<input type="text" class="input-edit" value="${currentText}">`;
+            });
+
+            // Ganti tombol Edit jadi Simpan
+            button.classList.remove('btn-edit');
+            button.classList.add('btn-save');
+            button.innerHTML = '<i class="fa-solid fa-check"></i>'; // Icon Centang
+            
+        } else {
+            // === MODE SIMPAN (Kembalikan Input jadi Text) ===
+            
+            const inputs = tbody.querySelectorAll('input.input-edit');
+            
+            inputs.forEach(input => {
+                const newValue = input.value;
+                const cell = input.parentElement;
+                cell.innerText = newValue;
+            });
+
+            // Ganti tombol Simpan kembali jadi Edit
+            button.classList.remove('btn-save');
+            button.classList.add('btn-edit');
+            button.innerHTML = '<i class="fa-solid fa-pen-to-square"></i>'; // Icon Pensil
+            
+            // Optional: Alert
+            // alert("Data berhasil diperbarui!");
+        }
+    }
+
+    // Fungsi Hapus Group
+    function deleteGroup(button) {
+        if(confirm("Yakin ingin menghapus seluruh data Jenis Truck ini?")) {
+            const tbody = button.closest('tbody');
+            tbody.remove();
+        }
+    }
+</script>
             <div id="page-route" class="page"><div class="card"><h3>📍 Route Planning Master</h3><p>Modul dalam pengembangan (Tersambung ke Firestore).</p></div></div>
             <div id="page-driver" class="page"><div class="card"><h3>👮 Driver Master Data</h3><p>Modul dalam pengembangan (Tersambung ke Firestore).</p></div></div>
             <div id="page-vehicle" class="page"><div class="card"><h3>🚛 Vehicle Master Data</h3><p>Modul dalam pengembangan (Tersambung ke Firestore).</p></div></div>
@@ -4437,18 +4639,41 @@ function renderCustomerTable(data = customerDB) {
     renderSalesGroupTables();
 }
 
-// 3. RENDER TABLE BAWAH
+// 3. RENDER TABLE BAWAH (DENGAN PENCARIAN CMI & BU17)
 function renderSalesGroupTables() {
     const tbodyCMI = document.getElementById('tbody-cmi');
     const tbodyBU17 = document.getElementById('tbody-bu17');
+    
     if(!tbodyCMI || !tbodyBU17) return;
 
-    const listCMI = customerDB.filter(c => c.group === 'CMI');
-    const listBU17 = customerDB.filter(c => c.group === 'BU17');
+    // 1. Ambil Text dari Kotak Pencarian Baru
+    // (Menggunakan '|| ""' untuk mencegah error jika elemen belum ada)
+    const searchCMI = (document.getElementById('search-cmi')?.value || "").toUpperCase();
+    const searchBU17 = (document.getElementById('search-bu17')?.value || "").toUpperCase();
 
+    // 2. Filter Data CMI (Group = CMI  DAN  Cocok dengan Pencarian)
+    const listCMI = customerDB.filter(c => {
+        return c.group === 'CMI' && (
+            c.name.toUpperCase().includes(searchCMI) || 
+            c.city.toUpperCase().includes(searchCMI) ||
+            (c.picSales || '').toUpperCase().includes(searchCMI)
+        );
+    });
+
+    // 3. Filter Data BU17 (Group = BU17  DAN  Cocok dengan Pencarian)
+    const listBU17 = customerDB.filter(c => {
+        return c.group === 'BU17' && (
+            c.name.toUpperCase().includes(searchBU17) || 
+            c.city.toUpperCase().includes(searchBU17) ||
+            (c.picSales || '').toUpperCase().includes(searchBU17)
+        );
+    });
+
+    // Update Badge Angka
     if(document.getElementById('badge-cmi')) document.getElementById('badge-cmi').innerText = listCMI.length;
     if(document.getElementById('badge-bu17')) document.getElementById('badge-bu17').innerText = listBU17.length;
 
+    // Helper Baris Tabel
     const createRow = (item, idx) => `
         <tr>
             <td style="text-align:center;">${idx + 1}</td>
@@ -4463,8 +4688,19 @@ function renderSalesGroupTables() {
         </tr>
     `;
 
-    tbodyCMI.innerHTML = listCMI.length ? listCMI.map((item, i) => createRow(item, i)).join('') : '<tr><td colspan="6" style="text-align:center;">Belum ada data CMI</td></tr>';
-    tbodyBU17.innerHTML = listBU17.length ? listBU17.map((item, i) => createRow(item, i)).join('') : '<tr><td colspan="6" style="text-align:center;">Belum ada data BU17</td></tr>';
+    // Render HTML CMI
+    if (listCMI.length > 0) {
+        tbodyCMI.innerHTML = listCMI.map((item, i) => createRow(item, i)).join('');
+    } else {
+        tbodyCMI.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#94a3b8; font-style:italic;">Data tidak ditemukan</td></tr>';
+    }
+
+    // Render HTML BU17
+    if (listBU17.length > 0) {
+        tbodyBU17.innerHTML = listBU17.map((item, i) => createRow(item, i)).join('');
+    } else {
+        tbodyBU17.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:20px; color:#94a3b8; font-style:italic;">Data tidak ditemukan</td></tr>';
+    }
 }
 
 // 4. LOGIC PENCARIAN SEDERHANA (SINGLE INPUT)
